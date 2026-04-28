@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property string $name
  * @property string $slug
  * @property bool $is_own
+ * @property bool $publish_to_shoptet
  * @property bool $is_active
  * @property string|null $notes
  *
@@ -25,11 +26,13 @@ final class Supplier extends Model
 
     protected $attributes = [
         'is_own' => false,
+        'publish_to_shoptet' => true,
         'is_active' => true,
     ];
 
     protected $casts = [
         'is_own' => 'boolean',
+        'publish_to_shoptet' => 'boolean',
         'is_active' => 'boolean',
     ];
 

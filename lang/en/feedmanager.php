@@ -39,6 +39,21 @@ return [
         'gallery' => 'Image gallery',
         'parameters' => 'Parameters',
     ],
+    'shoptet_exports' => [
+        'label' => 'Shoptet auto-import',
+        'plural_label' => 'Shoptet auto-imports',
+        'navigation_label' => 'Shoptet auto-imports',
+        'sections' => [
+            'identity' => 'Export identity',
+            'access' => 'URL for Shoptet auto-import',
+            'notes' => 'Notes',
+        ],
+        'regenerate_warning' => 'The current URL will stop working. The new link must be entered into the Shoptet admin. This action cannot be undone.',
+    ],
+    'shoptet_feed_types' => [
+        'full' => 'Full (1×/day)',
+        'stock' => 'Update — prices + stock (1–16×/day)',
+    ],
     'partners' => [
         'label' => 'Partner',
         'plural_label' => 'Partners',
@@ -258,6 +273,7 @@ return [
 
         'supplier_name' => 'Source name',
         'supplier_is_own' => 'Own eshop',
+        'publish_to_shoptet' => 'Publish to Shoptet eshop',
         'supplier_kind' => 'Source type',
         'slug' => 'Slug',
         'is_active' => 'Active',
@@ -273,7 +289,10 @@ return [
         'http_username' => 'HTTP username (basic auth)',
         'http_password' => 'HTTP password (basic auth)',
         'last_run_at' => 'Last run',
+        'last_count' => 'Last products count',
         'last_status' => 'Last status',
+        'shoptet_export_name' => 'Export name',
+        'shoptet_feed_type' => 'Feed type',
 
         'export_config_name' => 'Outbound feed name',
         'price_mode' => 'Price mode',
@@ -323,6 +342,9 @@ return [
         'is_excluded' => 'If enabled, this product will not be included in any output feed (B2C or B2B).',
         'locked_fields' => 'List of fields that must not be overwritten by the next import (e.g. name, price_vat).',
         'access_token' => 'UUID the partner appends to the URL as ?token=…. Generated on save; can be regenerated via the table action.',
+        'shoptet_export_slug' => 'Short technical identifier (kebab-case). Not used in the URL — URL uses access_token. Internal reference only.',
+        'shoptet_feed_type' => 'Full = entire catalogue 1×/day. Update = prices + stock + availability only, can be polled 1–16×/day depending on the client\'s Shoptet tariff.',
+        'shoptet_access_token' => 'Token in URL `/feeds/shoptet/{token}.xml`. Generated on save; the "Regenerate" action rotates it (breaks the current Shoptet connection).',
         'feeds_active' => 'Disabling immediately blocks the partner from the feed endpoint (HTTP 403).',
         'feed_full_limit' => 'Maximum number of successful full-feed downloads per 24 hours. 0 = blocked.',
         'feed_stock_limit' => 'Maximum number of successful stock-feed downloads per 24 hours. 0 = blocked.',
@@ -334,6 +356,7 @@ return [
         'default_b2b_allowed' => 'When on (default), products imported from this feed get is_b2b_allowed=true on creation. Switch off for "I am reselling, no wholesale rights" suppliers — products land B2B-blocked unless approved one by one.',
         'slug' => 'Short technical identifier (kebab-case). Used in internal references and logs.',
         'supplier_is_own' => 'On for the client\'s own eshop. Off for external suppliers they purchase from. Import logic is identical — the flag is purely a UX label so admins don\'t see "Supplier: Markstore" pointing at themselves.',
+        'publish_to_shoptet' => 'When on, products from this source enter the Shoptet auto-import feed (Tier 2 PRO). Turn off for suppliers whose catalogue should not appear in the client\'s eshop.',
         'feed_config_source' => 'Pick where the feed comes from. 🏠 = own eshop, 📦 = external supplier.',
         'feed_config_is_active' => 'If disabled, the feed will not run — neither manually nor from cron.',
         'auto_update' => 'If enabled, the `feedmanager:import` cron will pick it up. Disabled = manual-only.',

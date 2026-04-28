@@ -35,6 +35,10 @@ final class SupplierForm
                 ->label(__('feedmanager::feedmanager.fields.supplier_is_own'))
                 ->helperText(__('feedmanager::feedmanager.helpers.supplier_is_own'))
                 ->default(false),
+            Toggle::make('publish_to_shoptet')
+                ->label(__('feedmanager::feedmanager.fields.publish_to_shoptet'))
+                ->helperText(__('feedmanager::feedmanager.helpers.publish_to_shoptet'))
+                ->default(true),
             Toggle::make('is_active')
                 ->label(__('feedmanager::feedmanager.fields.is_active'))
                 ->default(true),

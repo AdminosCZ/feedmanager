@@ -39,6 +39,21 @@ return [
         'gallery' => 'Galéria obrázkov',
         'parameters' => 'Parametre',
     ],
+    'shoptet_exports' => [
+        'label' => 'Shoptet auto-import',
+        'plural_label' => 'Shoptet auto-importy',
+        'navigation_label' => 'Shoptet auto-importy',
+        'sections' => [
+            'identity' => 'Identifikácia exportu',
+            'access' => 'URL pre Shoptet auto-import',
+            'notes' => 'Poznámky',
+        ],
+        'regenerate_warning' => 'Aktuálna URL prestane fungovať. V Shoptet admine bude treba zadať nový odkaz. Akciu nemožno vrátiť späť.',
+    ],
+    'shoptet_feed_types' => [
+        'full' => 'Úplný (1×/deň)',
+        'stock' => 'Aktualizačný — ceny + sklad (1–16×/deň)',
+    ],
     'partners' => [
         'label' => 'Partner',
         'plural_label' => 'Partneri',
@@ -258,6 +273,7 @@ return [
 
         'supplier_name' => 'Názov zdroja',
         'supplier_is_own' => 'Vlastný eshop',
+        'publish_to_shoptet' => 'Publikovať do Shoptet eshopu',
         'supplier_kind' => 'Typ zdroja',
         'slug' => 'Slug',
         'is_active' => 'Aktívny',
@@ -273,7 +289,10 @@ return [
         'http_username' => 'HTTP username (basic auth)',
         'http_password' => 'HTTP heslo (basic auth)',
         'last_run_at' => 'Posledný beh',
+        'last_count' => 'Posledných produktov',
         'last_status' => 'Posledný status',
+        'shoptet_export_name' => 'Názov exportu',
+        'shoptet_feed_type' => 'Typ feedu',
 
         'export_config_name' => 'Názov výstupného feedu',
         'price_mode' => 'Režim ceny',
@@ -323,6 +342,9 @@ return [
         'is_excluded' => 'Ak je aktívne, produkt nepôjde do žiadneho výstupného feedu (B2C ani B2B).',
         'locked_fields' => 'Zoznam polí, ktoré sa nesmú prepísať pri ďalšom importe (napr. name, price_vat).',
         'access_token' => 'UUID, ktoré partner pridá do URL ako ?token=…. Generuje sa pri uložení; možno ho regenerovať akciou v tabuľke.',
+        'shoptet_export_slug' => 'Krátky technický identifikátor (kebab-case). V URL sa nepoužíva — URL používa access_token. Slúži len na internú referenciu.',
+        'shoptet_feed_type' => 'Úplný = celý katalóg 1×/deň. Aktualizačný = iba ceny + sklad + dostupnosť, možno poslať 1–16× denne podľa Shoptet tarifu klienta.',
+        'shoptet_access_token' => 'Token v URL `/feeds/shoptet/{token}.xml`. Generuje sa pri uložení; cez akciu „Regenerovať" ho možno obmeniť (rozbije aktuálne Shoptet napojenie).',
         'feeds_active' => 'Vypnutím okamžite zablokujete partnerovi prístup k feedu (HTTP 403).',
         'feed_full_limit' => 'Maximálny počet úspešných stiahnutí full feedu za posledných 24 hodín. 0 = zakázané.',
         'feed_stock_limit' => 'Maximálny počet úspešných stiahnutí stock feedu za posledných 24 hodín. 0 = zakázané.',
@@ -334,6 +356,7 @@ return [
         'default_b2b_allowed' => 'Keď zapnuté (default), nové importované produkty majú is_b2b_allowed=true. Pre re-predávaných dodávateľov bez veľkoobchodných práv vypni.',
         'slug' => 'Krátky technický identifikátor (kebab-case). Použije sa v interných referenciách a logu.',
         'supplier_is_own' => 'Zapnuté pre tvoj vlastný eshop. Vypnuté pre externých dodávateľov, od ktorých nakupuješ. Logika importu je rovnaká, slúži len na vizuálne rozlíšenie v admin UI.',
+        'publish_to_shoptet' => 'Keď zapnuté, produkty z tohto zdroja vstúpia do Shoptet auto-import feedu (Tier 2 PRO). Vypni pre dodávateľov, ktorých katalóg sa nemá objaviť v klientskom eshope.',
         'feed_config_source' => 'Vyber, odkiaľ feed pochádza. 🏠 = vlastný eshop, 📦 = externý dodávateľ.',
         'feed_config_is_active' => 'Ak je zakázané, feed sa nespustí ani manuálne, ani z cronu.',
         'auto_update' => 'Ak je zapnuté, cron `feedmanager:import` ho v plánovanom behu spracuje. Vypnuté = len manuálne spustenie.',
