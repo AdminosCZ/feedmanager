@@ -132,6 +132,48 @@ final class FeedImporterTest extends TestCase
         $this->assertSame(FeedConfig::STATUS_SUCCESS, $config->last_status);
     }
 
+    public function test_default_b2b_allowed_false_imports_products_blocked_for_b2b(): void
+    {
+        $config = $this->makeConfig(['default_b2b_allowed' => false]);
+        $importer = $this->makeImporter($this->fakeFeedXml());
+
+        $importer->run($config);
+
+        $product = Product::query()->where('code', 'SKU-1')->first();
+        $this->assertNotNull($product);
+        $this->assertFalse($product->is_b2b_allowed);
+    }
+
+    public function test_default_b2b_allowed_true_imports_products_open_for_b2b(): void
+    {
+        $config = $this->makeConfig(['default_b2b_allowed' => true]);
+        $importer = $this->makeImporter($this->fakeFeedXml());
+
+        $importer->run($config);
+
+        $product = Product::query()->where('code', 'SKU-1')->first();
+        $this->assertTrue($product->is_b2b_allowed);
+    }
+
+    public function test_default_b2b_allowed_does_not_overwrite_existing_product(): void
+    {
+        $config = $this->makeConfig(['default_b2b_allowed' => false]);
+
+        // Pre-existing product, admin already approved it for B2B.
+        Product::query()->create([
+            'supplier_id' => $config->supplier_id,
+            'code' => 'SKU-1',
+            'name' => 'existing',
+            'is_b2b_allowed' => true,
+        ]);
+
+        $importer = $this->makeImporter($this->fakeFeedXml());
+        $importer->run($config);
+
+        $product = Product::query()->where('code', 'SKU-1')->first();
+        $this->assertTrue($product->is_b2b_allowed, 'existing approval must survive re-import');
+    }
+
     private function makeConfig(array $overrides = []): FeedConfig
     {
         $supplier = Supplier::query()->create([

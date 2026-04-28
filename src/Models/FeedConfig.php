@@ -52,9 +52,16 @@ final class FeedConfig extends Model
 
     protected $guarded = ['id'];
 
+    protected $attributes = [
+        'is_active' => true,
+        'auto_update' => false,
+        'default_b2b_allowed' => true,
+    ];
+
     protected $casts = [
         'is_active' => 'boolean',
         'auto_update' => 'boolean',
+        'default_b2b_allowed' => 'boolean',
         'last_run_at' => 'datetime',
         // Laravel's `encrypted` cast uses APP_KEY for AES-256-CBC + HMAC.
         // Encrypted values are larger than plaintext — make sure the column

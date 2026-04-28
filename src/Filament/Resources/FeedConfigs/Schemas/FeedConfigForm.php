@@ -67,7 +67,7 @@ final class FeedConfigForm
                 ]),
 
             Section::make(__('feedmanager::feedmanager.feed_configs.sections.scheduling'))
-                ->columns(2)
+                ->columns(3)
                 ->components([
                     Toggle::make('is_active')
                         ->label(__('feedmanager::feedmanager.fields.is_active'))
@@ -77,6 +77,10 @@ final class FeedConfigForm
                         ->label(__('feedmanager::feedmanager.fields.auto_update'))
                         ->default(false)
                         ->helperText(__('feedmanager::feedmanager.helpers.auto_update')),
+                    Toggle::make('default_b2b_allowed')
+                        ->label(__('feedmanager::feedmanager.fields.default_b2b_allowed'))
+                        ->default(true)
+                        ->helperText(__('feedmanager::feedmanager.helpers.default_b2b_allowed')),
                 ]),
         ]);
     }

@@ -71,6 +71,7 @@ final class Product extends Model
         'stock_quantity' => 'integer',
         'is_b2b_allowed' => 'boolean',
         'is_excluded' => 'boolean',
+        'b2b_low_stock_threshold' => 'integer',
         'delivery_date' => 'date',
         'imported_at' => 'datetime',
         'locked_fields' => 'array',

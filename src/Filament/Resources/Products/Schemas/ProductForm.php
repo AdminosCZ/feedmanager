@@ -127,6 +127,24 @@ final class ProductForm
                         ->default(false),
                 ]),
 
+            Section::make(__('feedmanager::feedmanager.products.sections.b2b_thresholds'))
+                ->description(__('feedmanager::feedmanager.products.b2b_thresholds_help'))
+                ->columns(2)
+                ->collapsed()
+                ->components([
+                    TextInput::make('b2b_low_stock_threshold')
+                        ->label(__('feedmanager::feedmanager.fields.b2b_low_stock_threshold'))
+                        ->helperText(__('feedmanager::feedmanager.helpers.b2b_low_stock_threshold'))
+                        ->numeric()
+                        ->minValue(0)
+                        ->placeholder(__('feedmanager::feedmanager.placeholders.b2b_low_stock_threshold')),
+                    TextInput::make('b2b_low_stock_availability')
+                        ->label(__('feedmanager::feedmanager.fields.b2b_low_stock_availability'))
+                        ->helperText(__('feedmanager::feedmanager.helpers.b2b_low_stock_availability'))
+                        ->maxLength(64)
+                        ->placeholder(__('feedmanager::feedmanager.placeholders.b2b_low_stock_availability')),
+                ]),
+
             Section::make(__('feedmanager::feedmanager.products.sections.overrides'))
                 ->description(__('feedmanager::feedmanager.products.sections.overrides_help'))
                 ->columns(2)

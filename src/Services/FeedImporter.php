@@ -133,11 +133,16 @@ class FeedImporter
             ->first();
 
         if ($existing === null) {
+            // On create, honour the FeedConfig's `default_b2b_allowed` flag so
+            // re-seller catalogues can land with B2B blocked by default. On
+            // update, the existing value is preserved (admin may have flipped
+            // it manually).
             Product::query()->create([
                 'supplier_id' => $config->supplier_id,
                 'feed_config_id' => $config->id,
                 'code' => $parsed->code,
                 'imported_at' => now(),
+                'is_b2b_allowed' => $config->default_b2b_allowed,
                 ...$parsed->toAttributes(),
             ]);
 
