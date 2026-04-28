@@ -1,0 +1,54 @@
+{
+    "$schema": "https://getcomposer.org/schema.json",
+    "name": "adminos/feedmanager",
+    "description": "Product feed manager for ADMINOS — catalog management plus B2B partner feeds and B2C marketplace feeds.",
+    "type": "library",
+    "license": "proprietary",
+    "homepage": "https://adminos.cz",
+    "support": {
+        "issues": "https://github.com/AdminosCZ/adminos/issues",
+        "source": "https://github.com/AdminosCZ/feedmanager"
+    },
+    "require": {
+        "php": "^8.3",
+        "adminos/core": "^0.1.0-alpha.2@dev",
+        "filament/filament": "^4.0",
+        "illuminate/contracts": "^13.0",
+        "illuminate/database": "^13.0",
+        "illuminate/support": "^13.0"
+    },
+    "require-dev": {
+        "orchestra/testbench": "^11.0",
+        "phpunit/phpunit": "^12.5"
+    },
+    "autoload": {
+        "psr-4": {
+            "Adminos\\Modules\\Feedmanager\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Adminos\\Modules\\Feedmanager\\Tests\\": "tests/"
+        }
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-main": "0.1.x-dev"
+        },
+        "adminos": {
+            "id": "feedmanager",
+            "name": "Feed Manager",
+            "description": "Catalog management with B2B partner feeds and B2C marketplace feeds."
+        },
+        "laravel": {
+            "providers": [
+                "Adminos\\Modules\\Feedmanager\\FeedmanagerServiceProvider"
+            ]
+        }
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}
