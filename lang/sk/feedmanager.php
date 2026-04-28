@@ -61,9 +61,15 @@ return [
         'recent_downloads' => 'Posledné stiahnutia',
     ],
     'suppliers' => [
-        'label' => 'Dodávateľ',
-        'plural_label' => 'Dodávatelia',
-        'navigation_label' => 'Dodávatelia',
+        'label' => 'Zdroj produktov',
+        'plural_label' => 'Zdroje produktov',
+        'navigation_label' => 'Zdroje produktov',
+        'kind' => [
+            'own' => 'Vlastný eshop',
+            'external' => 'Dodávateľ',
+            'own_prefix' => '🏠',
+            'external_prefix' => '📦',
+        ],
     ],
     'feed_configs' => [
         'label' => 'Vstupný feed',
@@ -249,7 +255,9 @@ return [
         'default_b2b_allowed' => 'Default B2B povolenie',
         'notes' => 'Interná poznámka',
 
-        'supplier_name' => 'Názov dodávateľa',
+        'supplier_name' => 'Názov zdroja',
+        'supplier_is_own' => 'Vlastný eshop',
+        'supplier_kind' => 'Typ zdroja',
         'slug' => 'Slug',
         'is_active' => 'Aktívny',
         'feed_configs_count' => 'Počet feedov',
@@ -257,6 +265,7 @@ return [
 
         'feed_config_name' => 'Názov feedu',
         'supplier' => 'Dodávateľ',
+        'source' => 'Zdroj produktov',
         'source_url' => 'URL zdroja',
         'format' => 'Formát',
         'auto_update' => 'Automatický update (cron)',
@@ -323,6 +332,8 @@ return [
         'b2b_low_stock_availability' => 'Voliteľný per-product label. Ak prázdne, použije sa partner default.',
         'default_b2b_allowed' => 'Keď zapnuté (default), nové importované produkty majú is_b2b_allowed=true. Pre re-predávaných dodávateľov bez veľkoobchodných práv vypni.',
         'slug' => 'Krátky technický identifikátor (kebab-case). Použije sa v interných referenciách a logu.',
+        'supplier_is_own' => 'Zapnuté pre tvoj vlastný eshop. Vypnuté pre externých dodávateľov, od ktorých nakupuješ. Logika importu je rovnaká, slúži len na vizuálne rozlíšenie v admin UI.',
+        'feed_config_source' => 'Vyber, odkiaľ feed pochádza. 🏠 = vlastný eshop, 📦 = externý dodávateľ.',
         'feed_config_is_active' => 'Ak je zakázané, feed sa nespustí ani manuálne, ani z cronu.',
         'auto_update' => 'Ak je zapnuté, cron `feedmanager:import` ho v plánovanom behu spracuje. Vypnuté = len manuálne spustenie.',
 

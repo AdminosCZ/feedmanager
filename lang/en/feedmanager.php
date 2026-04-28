@@ -61,9 +61,15 @@ return [
         'recent_downloads' => 'Recent downloads',
     ],
     'suppliers' => [
-        'label' => 'Supplier',
-        'plural_label' => 'Suppliers',
-        'navigation_label' => 'Suppliers',
+        'label' => 'Product source',
+        'plural_label' => 'Product sources',
+        'navigation_label' => 'Product sources',
+        'kind' => [
+            'own' => 'Own eshop',
+            'external' => 'Supplier',
+            'own_prefix' => '🏠',
+            'external_prefix' => '📦',
+        ],
     ],
     'feed_configs' => [
         'label' => 'Inbound feed',
@@ -249,7 +255,9 @@ return [
         'default_b2b_allowed' => 'Default B2B allowed',
         'notes' => 'Internal note',
 
-        'supplier_name' => 'Supplier name',
+        'supplier_name' => 'Source name',
+        'supplier_is_own' => 'Own eshop',
+        'supplier_kind' => 'Source type',
         'slug' => 'Slug',
         'is_active' => 'Active',
         'feed_configs_count' => 'Feeds',
@@ -257,6 +265,7 @@ return [
 
         'feed_config_name' => 'Feed name',
         'supplier' => 'Supplier',
+        'source' => 'Product source',
         'source_url' => 'Source URL',
         'format' => 'Format',
         'auto_update' => 'Auto-update (cron)',
@@ -323,6 +332,8 @@ return [
         'b2b_low_stock_availability' => 'Optional per-product label override. Leave empty to use the partner default.',
         'default_b2b_allowed' => 'When on (default), products imported from this feed get is_b2b_allowed=true on creation. Switch off for "I am reselling, no wholesale rights" suppliers — products land B2B-blocked unless approved one by one.',
         'slug' => 'Short technical identifier (kebab-case). Used in internal references and logs.',
+        'supplier_is_own' => 'On for the client\'s own eshop. Off for external suppliers they purchase from. Import logic is identical — the flag is purely a UX label so admins don\'t see "Supplier: Markstore" pointing at themselves.',
+        'feed_config_source' => 'Pick where the feed comes from. 🏠 = own eshop, 📦 = external supplier.',
         'feed_config_is_active' => 'If disabled, the feed will not run — neither manually nor from cron.',
         'auto_update' => 'If enabled, the `feedmanager:import` cron will pick it up. Disabled = manual-only.',
 

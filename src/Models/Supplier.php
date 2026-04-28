@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property int $id
  * @property string $name
  * @property string $slug
+ * @property bool $is_own
  * @property bool $is_active
  * @property string|null $notes
  *
@@ -22,7 +23,13 @@ final class Supplier extends Model
 
     protected $guarded = ['id'];
 
+    protected $attributes = [
+        'is_own' => false,
+        'is_active' => true,
+    ];
+
     protected $casts = [
+        'is_own' => 'boolean',
         'is_active' => 'boolean',
     ];
 

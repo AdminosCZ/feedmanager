@@ -31,6 +31,10 @@ final class SupplierForm
                 ->unique(ignoreRecord: true)
                 ->maxLength(64)
                 ->helperText(__('feedmanager::feedmanager.helpers.slug')),
+            Toggle::make('is_own')
+                ->label(__('feedmanager::feedmanager.fields.supplier_is_own'))
+                ->helperText(__('feedmanager::feedmanager.helpers.supplier_is_own'))
+                ->default(false),
             Toggle::make('is_active')
                 ->label(__('feedmanager::feedmanager.fields.is_active'))
                 ->default(true),

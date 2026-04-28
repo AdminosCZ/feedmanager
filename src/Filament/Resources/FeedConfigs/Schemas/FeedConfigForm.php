@@ -21,15 +21,23 @@ final class FeedConfigForm
                 ->columns(2)
                 ->components([
                     Select::make('supplier_id')
-                        ->label(__('feedmanager::feedmanager.fields.supplier'))
-                        ->relationship('supplier', 'name')
+                        ->label(__('feedmanager::feedmanager.fields.source'))
+                        ->helperText(__('feedmanager::feedmanager.helpers.feed_config_source'))
+                        ->relationship(
+                            name: 'supplier',
+                            titleAttribute: 'name',
+                            // Own eshops first, then external suppliers alphabetically.
+                            modifyQueryUsing: fn ($query) => $query
+                                ->orderBy('is_own', 'desc')
+                                ->orderBy('name'),
+                        )
                         ->required()
                         ->preload()
                         ->searchable()
-                        ->createOptionForm(fn (Schema $createSchema): Schema => $createSchema->components([
+                        ->createOptionForm([
                             TextInput::make('name')->required(),
                             TextInput::make('slug')->required()->unique(Supplier::class, 'slug'),
-                        ])),
+                        ]),
                     TextInput::make('name')
                         ->label(__('feedmanager::feedmanager.fields.feed_config_name'))
                         ->required()
