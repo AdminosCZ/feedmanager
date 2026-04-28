@@ -68,6 +68,7 @@ final class FeedConfigsTable
                         FeedConfig::FORMAT_HEUREKA => __('feedmanager::feedmanager.formats.heureka'),
                         FeedConfig::FORMAT_GOOGLE => __('feedmanager::feedmanager.formats.google'),
                         FeedConfig::FORMAT_SHOPTET => __('feedmanager::feedmanager.formats.shoptet'),
+                        FeedConfig::FORMAT_ZBOZI => __('feedmanager::feedmanager.formats.zbozi'),
                         FeedConfig::FORMAT_CUSTOM => __('feedmanager::feedmanager.formats.custom'),
                     ]),
             ])

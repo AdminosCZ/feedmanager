@@ -10,6 +10,7 @@ use Adminos\Modules\Feedmanager\Services\Parsing\FeedParserFactory;
 use Adminos\Modules\Feedmanager\Services\Parsing\GoogleShoppingFeedParser;
 use Adminos\Modules\Feedmanager\Services\Parsing\HeurekaFeedParser;
 use Adminos\Modules\Feedmanager\Services\Parsing\ShoptetFeedParser;
+use Adminos\Modules\Feedmanager\Services\Parsing\ZboziFeedParser;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 
@@ -31,6 +32,12 @@ final class FeedParserFactoryTest extends TestCase
     {
         $factory = new FeedParserFactory();
         $this->assertInstanceOf(ShoptetFeedParser::class, $factory->for(FeedConfig::FORMAT_SHOPTET));
+    }
+
+    public function test_returns_zbozi_parser_for_zbozi_format(): void
+    {
+        $factory = new FeedParserFactory();
+        $this->assertInstanceOf(ZboziFeedParser::class, $factory->for(FeedConfig::FORMAT_ZBOZI));
     }
 
     public function test_returns_custom_parser_for_custom_format(): void

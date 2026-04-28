@@ -32,6 +32,8 @@ final class FeedConfig extends Model
 
     public const FORMAT_SHOPTET = 'shoptet';
 
+    public const FORMAT_ZBOZI = 'zbozi';
+
     public const FORMAT_CUSTOM = 'custom';
 
     /** @var array<int, string> */
@@ -39,6 +41,7 @@ final class FeedConfig extends Model
         self::FORMAT_HEUREKA,
         self::FORMAT_GOOGLE,
         self::FORMAT_SHOPTET,
+        self::FORMAT_ZBOZI,
         self::FORMAT_CUSTOM,
     ];
 

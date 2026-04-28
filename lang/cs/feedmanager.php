@@ -197,7 +197,8 @@ return [
     'formats' => [
         'heureka' => 'Heuréka',
         'google' => 'Google Shopping',
-        'shoptet' => 'Shoptet',
+        'shoptet' => 'Shoptet (Heuréka-styl)',
+        'zbozi' => 'Zboží.cz / Shoptet seznam export',
         'custom' => 'Vlastní (heuristika)',
         'shoptet_out' => 'Shoptet XML',
         'heureka_out' => 'Heuréka XML',
