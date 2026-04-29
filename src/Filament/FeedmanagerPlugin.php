@@ -12,6 +12,7 @@ use Adminos\Modules\Feedmanager\Filament\Resources\ProductResource;
 use Adminos\Modules\Feedmanager\Filament\Resources\ShoptetCategoryResource;
 use Adminos\Modules\Feedmanager\Filament\Resources\SupplierCategoryResource;
 use Adminos\Modules\Feedmanager\Filament\Resources\SupplierResource;
+use Adminos\Modules\Feedmanager\Filament\Widgets\SuppliersStatsOverview;
 use Filament\Contracts\Plugin;
 use Filament\Panel;
 
@@ -39,6 +40,10 @@ final class FeedmanagerPlugin implements Plugin
 
         $panel->pages([
             FeedExplorerPage::class,
+        ]);
+
+        $panel->widgets([
+            SuppliersStatsOverview::class,
         ]);
     }
 

@@ -104,15 +104,25 @@ return [
         'recent_downloads' => 'Recent downloads',
     ],
     'suppliers' => [
-        'label' => 'Product source',
-        'plural_label' => 'Product sources',
-        'navigation_label' => 'Product sources',
+        'label' => 'Supplier',
+        'plural_label' => 'Suppliers',
+        'navigation_label' => 'Suppliers',
         'kind' => [
             'own' => 'Own eshop',
             'external' => 'Supplier',
             'own_prefix' => '🏠',
             'external_prefix' => '📦',
         ],
+    ],
+    'suppliers_overview' => [
+        'approved_products' => 'Approved products',
+        'new_products' => 'New products',
+        'new_products_hint' => 'Imported in last 7 days',
+        'pending_products' => 'Products to review',
+        'total_products' => 'Total products',
+        'unmapped_categories' => 'Unmapped categories',
+        'last_sync' => 'Last sync',
+        'last_sync_never' => 'Never',
     ],
     'feed_configs' => [
         'label' => 'Inbound feed',

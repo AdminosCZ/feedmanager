@@ -104,15 +104,25 @@ return [
         'recent_downloads' => 'Posledné stiahnutia',
     ],
     'suppliers' => [
-        'label' => 'Zdroj produktov',
-        'plural_label' => 'Zdroje produktov',
-        'navigation_label' => 'Zdroje produktov',
+        'label' => 'Dodávateľ',
+        'plural_label' => 'Dodávatelia',
+        'navigation_label' => 'Dodávatelia',
         'kind' => [
             'own' => 'Vlastný eshop',
             'external' => 'Dodávateľ',
             'own_prefix' => '🏠',
             'external_prefix' => '📦',
         ],
+    ],
+    'suppliers_overview' => [
+        'approved_products' => 'Schválené produkty',
+        'new_products' => 'Nové produkty',
+        'new_products_hint' => 'Importované za 7 dní',
+        'pending_products' => 'Produkty na kontrolu',
+        'total_products' => 'Celkom produktov',
+        'unmapped_categories' => 'Nespárované kategórie',
+        'last_sync' => 'Posledná synchronizácia',
+        'last_sync_never' => 'Zatiaľ nikdy',
     ],
     'feed_configs' => [
         'label' => 'Vstupný feed',
