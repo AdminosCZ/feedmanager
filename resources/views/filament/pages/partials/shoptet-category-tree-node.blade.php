@@ -15,12 +15,11 @@
 >
     @if ($hasChildren)
         <details class="fi-fl-tree-details" {{ $depth < 1 ? 'open' : '' }}>
-            <summary class="fi-fl-tree-summary group/node flex items-center gap-2 rounded-md px-2 py-1 hover:bg-gray-50 dark:hover:bg-white/5 cursor-pointer">
-                <span class="fi-fl-tree-chevron text-gray-400 transition-transform">
-                    <x-filament::icon
-                        icon="heroicon-m-chevron-right"
-                        class="h-4 w-4"
-                    />
+            <summary class="fi-fl-tree-row">
+                <span class="fi-fl-tree-chevron">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                        <path fill-rule="evenodd" d="M8.22 5.22a.75.75 0 0 1 1.06 0l4.25 4.25a.75.75 0 0 1 0 1.06l-4.25 4.25a.75.75 0 0 1-1.06-1.06L11.94 10 8.22 6.28a.75.75 0 0 1 0-1.06Z" clip-rule="evenodd"/>
+                    </svg>
                 </span>
                 @include('feedmanager::filament.pages.partials.shoptet-category-tree-label', [
                     'node' => $node,
@@ -29,7 +28,7 @@
                 ])
             </summary>
 
-            <ul class="fi-fl-tree-children ml-5 mt-0.5 space-y-0.5 border-l border-gray-200 pl-2 dark:border-white/10" role="group">
+            <ul class="fi-fl-tree-children" role="group">
                 @foreach ($children as $child)
                     @include('feedmanager::filament.pages.partials.shoptet-category-tree-node', [
                         'node' => $child,
@@ -40,8 +39,8 @@
             </ul>
         </details>
     @else
-        <div class="fi-fl-tree-leaf flex items-center gap-2 rounded-md px-2 py-1 hover:bg-gray-50 dark:hover:bg-white/5">
-            <span class="fi-fl-tree-leaf-bullet text-gray-300 dark:text-white/20">·</span>
+        <div class="fi-fl-tree-row">
+            <span class="fi-fl-tree-leaf-bullet" aria-hidden="true"></span>
             @include('feedmanager::filament.pages.partials.shoptet-category-tree-label', [
                 'node' => $node,
                 'mappingCount' => $mappingCount,
@@ -50,4 +49,3 @@
         </div>
     @endif
 </li>
-
