@@ -133,6 +133,16 @@ return [
             'present' => 'Active',
             'orphaned' => 'Orphaned',
         ],
+        'tree' => [
+            'empty' => 'Category tree is empty. Trigger a sync via the button above.',
+            'search_placeholder' => 'Search categories…',
+            'total' => ':count categories',
+            'orphan_summary' => ':count orphaned',
+            'mapped_suppliers' => ':count paired sources',
+            'orphaned_hint' => 'This category disappeared from Shoptet — any supplier mappings need to be re-paired.',
+            'hidden_in_shop' => 'Hidden in the shop',
+            'edit' => 'Edit',
+        ],
         'notify' => [
             'renamed_title' => 'Category ":title" was renamed',
             'moved_title' => 'Category ":title" was moved',

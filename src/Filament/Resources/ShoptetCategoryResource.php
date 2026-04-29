@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Adminos\Modules\Feedmanager\Filament\Resources;
 
-use Adminos\Modules\Feedmanager\Filament\Resources\ShoptetCategories\Pages\CreateShoptetCategory;
 use Adminos\Modules\Feedmanager\Filament\Resources\ShoptetCategories\Pages\EditShoptetCategory;
 use Adminos\Modules\Feedmanager\Filament\Resources\ShoptetCategories\Pages\ListShoptetCategories;
 use Adminos\Modules\Feedmanager\Models\ShoptetCategory;
@@ -149,9 +148,12 @@ final class ShoptetCategoryResource extends Resource
 
     public static function getPages(): array
     {
+        // Index renders the catalogue as a tree (Markstore-style hundreds of
+        // categories make the flat table unreadable). Edit stays for manual
+        // tweaks. Create is intentionally absent — categories come from
+        // sync, manual rows would have no shoptet_id and break the tree.
         return [
             'index' => ListShoptetCategories::route('/'),
-            'create' => CreateShoptetCategory::route('/create'),
             'edit' => EditShoptetCategory::route('/{record}/edit'),
         ];
     }

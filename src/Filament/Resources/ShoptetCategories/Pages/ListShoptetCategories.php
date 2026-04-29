@@ -5,18 +5,111 @@ declare(strict_types=1);
 namespace Adminos\Modules\Feedmanager\Filament\Resources\ShoptetCategories\Pages;
 
 use Adminos\Modules\Feedmanager\Filament\Resources\ShoptetCategoryResource;
+use Adminos\Modules\Feedmanager\Models\CategoryMapping;
 use Adminos\Modules\Feedmanager\Models\FeedConfig;
 use Adminos\Modules\Feedmanager\Models\ImportLog;
+use Adminos\Modules\Feedmanager\Models\ShoptetCategory;
 use Adminos\Modules\Feedmanager\Services\ShoptetCategorySyncService;
 use Filament\Actions\Action;
-use Filament\Actions\CreateAction;
 use Filament\Forms\Components\Select;
 use Filament\Notifications\Notification;
-use Filament\Resources\Pages\ListRecords;
+use Filament\Resources\Pages\Page;
+use Illuminate\Support\Collection;
 
-final class ListShoptetCategories extends ListRecords
+/**
+ * Tree-based browser for the Shoptet category catalogue. Builds the whole
+ * hierarchy in memory (a typical eshop has hundreds, not thousands of
+ * categories — no point streaming) and renders it recursively via blade,
+ * with native `<details>` for collapse and Alpine for full-text filter.
+ *
+ * The header sync action triggers {@see ShoptetCategorySyncService} for the
+ * selected `FORMAT_SHOPTET_CATEGORIES` feed config — same UX as before.
+ */
+final class ListShoptetCategories extends Page
 {
     protected static string $resource = ShoptetCategoryResource::class;
+
+    protected string $view = 'feedmanager::filament.pages.shoptet-categories-tree';
+
+    public function getTitle(): string
+    {
+        return ShoptetCategoryResource::getPluralModelLabel();
+    }
+
+    /**
+     * @return Collection<int, ShoptetCategory>
+     */
+    public function getRoots(): Collection
+    {
+        $all = ShoptetCategory::query()
+            ->orderBy('priority')
+            ->orderBy('title')
+            ->get();
+
+        // Build a set of every shoptet_id we have. Anything whose parent
+        // doesn't appear in the set is treated as a root — Shoptet ships
+        // category data with parent = 1 (the shop itself) for top-level
+        // categories, but row #1 is never exported, so we can't rely on
+        // null parent_shoptet_id alone.
+        $existing = $all->pluck('shoptet_id')->flip();
+
+        $byParent = $all->groupBy(
+            fn (ShoptetCategory $c): string => $c->parent_shoptet_id !== null
+                ? (string) $c->parent_shoptet_id
+                : 'root',
+        );
+
+        foreach ($all as $cat) {
+            $cat->setRelation(
+                'children',
+                $byParent->get((string) $cat->shoptet_id, collect()),
+            );
+        }
+
+        return $all
+            ->filter(fn (ShoptetCategory $c): bool => $c->parent_shoptet_id === null
+                || ! $existing->has($c->parent_shoptet_id))
+            ->values();
+    }
+
+    /**
+     * Map of `shoptet_category_id` → number of paired supplier categories.
+     * Rendered as a small badge next to each tree node so admin sees at a
+     * glance "this category has 3 supplier sources mapped to it".
+     *
+     * @return array<int, int>
+     */
+    public function getMappingCounts(): array
+    {
+        return CategoryMapping::query()
+            ->selectRaw('shoptet_category_id, count(*) as c')
+            ->groupBy('shoptet_category_id')
+            ->pluck('c', 'shoptet_category_id')
+            ->all();
+    }
+
+    public function getOrphanCount(): int
+    {
+        return ShoptetCategory::query()->where('is_orphaned', true)->count();
+    }
+
+    /**
+     * @return list<array{id: int, sid: int, parent: ?int, title: string, path: string}>
+     */
+    public function getSearchIndex(): array
+    {
+        return ShoptetCategory::query()
+            ->orderBy('shoptet_id')
+            ->get()
+            ->map(fn (ShoptetCategory $c): array => [
+                'id' => $c->id,
+                'sid' => $c->shoptet_id,
+                'parent' => $c->parent_shoptet_id,
+                'title' => $c->title,
+                'path' => $c->full_path ?? $c->title,
+            ])
+            ->all();
+    }
 
     protected function getHeaderActions(): array
     {
@@ -60,7 +153,6 @@ final class ListShoptetCategories extends ListRecords
                             ->send();
                     }
                 }),
-            CreateAction::make(),
         ];
     }
 

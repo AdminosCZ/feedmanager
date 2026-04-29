@@ -133,6 +133,16 @@ return [
             'present' => 'Aktívna',
             'orphaned' => 'Osirelá',
         ],
+        'tree' => [
+            'empty' => 'Strom kategórií je prázdny. Spusti synchronizáciu cez tlačidlo vpravo hore.',
+            'search_placeholder' => 'Hľadať v kategóriách…',
+            'total' => ':count kategórií',
+            'orphan_summary' => ':count osirelých',
+            'mapped_suppliers' => ':count napárovaných zdrojov',
+            'orphaned_hint' => 'Kategória zmizla zo Shoptetu — prípadné mapovanie dodávateľských kategórií treba prepárovať.',
+            'hidden_in_shop' => 'V eshope skrytá',
+            'edit' => 'Upraviť',
+        ],
         'notify' => [
             'renamed_title' => 'Kategória „:title" bola premenovaná',
             'moved_title' => 'Kategória „:title" bola presunutá',
