@@ -4,24 +4,19 @@ declare(strict_types=1);
 
 namespace Adminos\Modules\Feedmanager\Filament\Resources;
 
-use Adminos\Modules\Feedmanager\Filament\Resources\ShoptetCategories\Pages\EditShoptetCategory;
 use Adminos\Modules\Feedmanager\Filament\Resources\ShoptetCategories\Pages\ListShoptetCategories;
 use Adminos\Modules\Feedmanager\Models\ShoptetCategory;
 use BackedEnum;
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteBulkAction;
-use Filament\Actions\EditAction;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Toggle;
 use Filament\Resources\Resource;
-use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
-use Filament\Tables\Columns\IconColumn;
-use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Filters\TernaryFilter;
-use Filament\Tables\Table;
 
 /**
+ * Read-only resource. Categories are a snapshot of the upstream Shoptet
+ * eshop — any manual edit here would be silently overwritten on the next
+ * sync, so neither the form nor the table is exposed. The single index
+ * page renders the catalogue as a tree; the only mutation is the "Sync
+ * categories" action in the page header.
+ *
  * @api
  */
 final class ShoptetCategoryResource extends Resource
@@ -66,95 +61,10 @@ final class ShoptetCategoryResource extends Resource
         return 'warning';
     }
 
-    public static function form(Schema $schema): Schema
-    {
-        return $schema->components([
-            TextInput::make('shoptet_id')
-                ->label(__('feedmanager::feedmanager.fields.shoptet_id'))
-                ->numeric()
-                ->required()
-                ->unique(ignoreRecord: true),
-            TextInput::make('parent_shoptet_id')
-                ->label(__('feedmanager::feedmanager.fields.parent_shoptet_id'))
-                ->numeric(),
-            TextInput::make('title')
-                ->label(__('feedmanager::feedmanager.fields.shoptet_title'))
-                ->required()
-                ->maxLength(500)
-                ->columnSpanFull(),
-            TextInput::make('full_path')
-                ->label(__('feedmanager::feedmanager.fields.full_path'))
-                ->maxLength(1000)
-                ->columnSpanFull(),
-            TextInput::make('depth')
-                ->label(__('feedmanager::feedmanager.fields.depth'))
-                ->numeric()
-                ->default(0),
-            Toggle::make('visible')
-                ->label(__('feedmanager::feedmanager.fields.visible'))
-                ->default(true),
-        ]);
-    }
-
-    public static function table(Table $table): Table
-    {
-        return $table
-            ->defaultSort('full_path')
-            ->columns([
-                TextColumn::make('shoptet_id')
-                    ->label(__('feedmanager::feedmanager.fields.shoptet_id'))
-                    ->fontFamily('mono')
-                    ->sortable(),
-                TextColumn::make('full_path')
-                    ->label(__('feedmanager::feedmanager.fields.full_path'))
-                    ->searchable()
-                    ->sortable(),
-                TextColumn::make('depth')
-                    ->label(__('feedmanager::feedmanager.fields.depth'))
-                    ->alignEnd()
-                    ->toggleable(),
-                IconColumn::make('visible')
-                    ->label(__('feedmanager::feedmanager.fields.visible'))
-                    ->boolean()
-                    ->toggleable(),
-                TextColumn::make('is_orphaned')
-                    ->label(__('feedmanager::feedmanager.fields.orphaned_short'))
-                    ->badge()
-                    ->state(fn (ShoptetCategory $r): string => $r->is_orphaned ? 'orphaned' : 'present')
-                    ->color(fn (string $state): string => $state === 'orphaned' ? 'danger' : 'success')
-                    ->formatStateUsing(fn (string $state): string => __(
-                        'feedmanager::feedmanager.shoptet_categories.orphan_state.'.$state,
-                    ))
-                    ->toggleable(),
-                TextColumn::make('synced_at')
-                    ->label(__('feedmanager::feedmanager.fields.synced_at'))
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(),
-            ])
-            ->filters([
-                TernaryFilter::make('is_orphaned')
-                    ->label(__('feedmanager::feedmanager.fields.orphaned_short')),
-                TernaryFilter::make('visible')
-                    ->label(__('feedmanager::feedmanager.fields.visible')),
-            ])
-            ->recordActions([EditAction::make()])
-            ->toolbarActions([
-                BulkActionGroup::make([
-                    DeleteBulkAction::make(),
-                ]),
-            ]);
-    }
-
     public static function getPages(): array
     {
-        // Index renders the catalogue as a tree (Markstore-style hundreds of
-        // categories make the flat table unreadable). Edit stays for manual
-        // tweaks. Create is intentionally absent — categories come from
-        // sync, manual rows would have no shoptet_id and break the tree.
         return [
             'index' => ListShoptetCategories::route('/'),
-            'edit' => EditShoptetCategory::route('/{record}/edit'),
         ];
     }
 }

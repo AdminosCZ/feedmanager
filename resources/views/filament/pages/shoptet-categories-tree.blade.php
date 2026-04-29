@@ -138,25 +138,6 @@
                 background: rgba(255, 255, 255, 0.08);
             }
 
-            .fi-fl-tree-edit {
-                display: inline-flex;
-                width: 1.5rem;
-                height: 1.5rem;
-                align-items: center;
-                justify-content: center;
-                border-radius: 0.375rem;
-                color: rgb(100 116 139);
-                opacity: 0;
-                transition: opacity 150ms ease, background-color 150ms ease;
-            }
-            .fi-fl-tree-edit:hover {
-                background-color: rgba(0, 133, 254, 0.12);
-                color: rgb(0, 102, 204);
-            }
-            .fi-fl-tree-row:hover .fi-fl-tree-edit {
-                opacity: 1;
-            }
-
             .fi-fl-tree-toolbar {
                 display: flex;
                 flex-direction: column;

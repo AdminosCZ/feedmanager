@@ -141,7 +141,6 @@ return [
             'mapped_suppliers' => ':count paired sources',
             'orphaned_hint' => 'This category disappeared from Shoptet — any supplier mappings need to be re-paired.',
             'hidden_in_shop' => 'Hidden in the shop',
-            'edit' => 'Edit',
         ],
         'notify' => [
             'renamed_title' => 'Category ":title" was renamed',

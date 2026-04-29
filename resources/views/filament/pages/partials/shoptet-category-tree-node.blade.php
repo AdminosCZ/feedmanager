@@ -5,7 +5,6 @@
     $children = $node->children;
     $hasChildren = $children->isNotEmpty();
     $mappingCount = $counts[$node->id] ?? 0;
-    $editUrl = \Adminos\Modules\Feedmanager\Filament\Resources\ShoptetCategoryResource::getUrl('edit', ['record' => $node->id]);
 @endphp
 
 <li
@@ -24,7 +23,6 @@
                 @include('feedmanager::filament.pages.partials.shoptet-category-tree-label', [
                     'node' => $node,
                     'mappingCount' => $mappingCount,
-                    'editUrl' => $editUrl,
                 ])
             </summary>
 
@@ -44,7 +42,6 @@
             @include('feedmanager::filament.pages.partials.shoptet-category-tree-label', [
                 'node' => $node,
                 'mappingCount' => $mappingCount,
-                'editUrl' => $editUrl,
             ])
         </div>
     @endif

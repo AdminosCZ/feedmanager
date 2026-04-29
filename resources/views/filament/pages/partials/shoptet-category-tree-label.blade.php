@@ -1,7 +1,6 @@
 @php
     /** @var \Adminos\Modules\Feedmanager\Models\ShoptetCategory $node */
     /** @var int $mappingCount */
-    /** @var string $editUrl */
 @endphp
 
 <span class="fi-fl-tree-title">
@@ -37,14 +36,3 @@
         {{ $mappingCount }}
     </span>
 @endif
-
-<a
-    href="{{ $editUrl }}"
-    class="fi-fl-tree-edit"
-    title="{{ __('feedmanager::feedmanager.shoptet_categories.tree.edit') }}"
-    onclick="event.stopPropagation()"
->
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true" style="width:0.875rem;height:0.875rem;">
-        <path d="M2.695 14.762l-1.262 3.155a.5.5 0 0 0 .65.65l3.155-1.262a4 4 0 0 0 1.343-.886L17.5 5.501a2.121 2.121 0 0 0-3-3L3.58 13.419a4 4 0 0 0-.885 1.343Z"/>
-    </svg>
-</a>

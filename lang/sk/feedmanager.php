@@ -141,7 +141,6 @@ return [
             'mapped_suppliers' => ':count napárovaných zdrojov',
             'orphaned_hint' => 'Kategória zmizla zo Shoptetu — prípadné mapovanie dodávateľských kategórií treba prepárovať.',
             'hidden_in_shop' => 'V eshope skrytá',
-            'edit' => 'Upraviť',
         ],
         'notify' => [
             'renamed_title' => 'Kategória „:title" bola premenovaná',
