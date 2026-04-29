@@ -129,6 +129,17 @@ return [
         'label' => 'Target category (shop)',
         'plural_label' => 'Target categories (shop)',
         'navigation_label' => 'Shop categories',
+        'orphan_state' => [
+            'present' => 'Active',
+            'orphaned' => 'Orphaned',
+        ],
+        'notify' => [
+            'renamed_title' => 'Category ":title" was renamed',
+            'moved_title' => 'Category ":title" was moved',
+            'orphaned_title' => 'Category ":title" disappeared from Shoptet',
+            'changed_title' => 'Category ":title" changed',
+            'body' => 'Change: :detail. Paired supplier sources: :suppliers. Review the mapping in Category mappings.',
+        ],
     ],
     'supplier_categories' => [
         'label' => 'Category mapping',
@@ -244,6 +255,7 @@ return [
         'shoptet' => 'Shoptet (Heuréka-style)',
         'zbozi' => 'Zboží.cz / Shoptet seznam export',
         'shoptet_stock_csv' => 'Shoptet stock CSV (stock only)',
+        'shoptet_categories' => 'Shoptet shop categories (CSV/XML)',
         'custom' => 'Custom (heuristic)',
         'shoptet_out' => 'Shoptet XML',
         'heureka_out' => 'Heuréka XML',
@@ -380,6 +392,7 @@ return [
         'full_path' => 'Full path',
         'depth' => 'Depth',
         'visible' => 'Visible',
+        'orphaned_short' => 'Orphaned',
         'synced_at' => 'Synced',
         'shoptet_category' => 'Target category (shop)',
         'supplier_category_path' => 'Supplier path',
@@ -470,6 +483,9 @@ return [
         'bulk_approve' => 'Bulk approve',
         'bulk_reject' => 'Bulk reject',
 
+        'sync_categories' => 'Sync categories',
+        'sync_categories_heading' => 'Pull the latest category tree from Shoptet?',
+        'sync_categories_description' => 'Pick a feed with format "Shoptet shop categories". The current list is downloaded, missing entries are added, renames are updated, and disappeared entries are flagged as orphaned.',
         'test_connection' => 'Test connection',
         'map_category' => 'Map',
         'map_modal_heading' => 'Mapping category "":path""',
@@ -477,6 +493,9 @@ return [
         'auto_map_confirm' => 'For each unmapped category of the selected supplier, find the best matching shop category by fuzzy name match (>= 80%).',
     ],
     'notifications' => [
+        'sync_categories_done' => 'Category sync finished.',
+        'sync_categories_failed' => 'Category sync failed.',
+        'sync_categories_no_config' => 'No valid category feed selected.',
         'import_done_title' => 'Import finished',
         'import_done_body' => 'Found :found, new :new, updated :updated, failed :failed.',
         'import_failed_title' => 'Import failed',

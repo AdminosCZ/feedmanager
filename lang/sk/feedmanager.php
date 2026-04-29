@@ -129,6 +129,17 @@ return [
         'label' => 'Cieľová kategória (eshop)',
         'plural_label' => 'Cieľové kategórie (eshop)',
         'navigation_label' => 'Kategórie eshopu',
+        'orphan_state' => [
+            'present' => 'Aktívna',
+            'orphaned' => 'Osirelá',
+        ],
+        'notify' => [
+            'renamed_title' => 'Kategória „:title" bola premenovaná',
+            'moved_title' => 'Kategória „:title" bola presunutá',
+            'orphaned_title' => 'Kategória „:title" zmizla zo Shoptetu',
+            'changed_title' => 'Kategória „:title" sa zmenila',
+            'body' => 'Zmena: :detail. Napárované zdroje produktov: :suppliers. Skontroluj mapovanie v sekcii Mapovanie kategórií.',
+        ],
     ],
     'supplier_categories' => [
         'label' => 'Mapovanie kategórie',
@@ -244,6 +255,7 @@ return [
         'shoptet' => 'Shoptet (Heuréka-štýl)',
         'zbozi' => 'Zboží.cz / Shoptet seznam export',
         'shoptet_stock_csv' => 'Shoptet stock CSV (iba sklad)',
+        'shoptet_categories' => 'Shoptet kategórie eshopu (CSV/XML)',
         'custom' => 'Vlastný (heuristika)',
         'shoptet_out' => 'Shoptet XML',
         'heureka_out' => 'Heuréka XML',
@@ -380,6 +392,7 @@ return [
         'full_path' => 'Plná cesta',
         'depth' => 'Hĺbka',
         'visible' => 'Viditeľná',
+        'orphaned_short' => 'Osirelá',
         'synced_at' => 'Synchronizované',
         'shoptet_category' => 'Cieľová kategória (eshop)',
         'supplier_category_path' => 'Cesta dodávateľa',
@@ -470,6 +483,9 @@ return [
         'bulk_approve' => 'Hromadne schváliť',
         'bulk_reject' => 'Hromadne zamietnuť',
 
+        'sync_categories' => 'Synchronizovať kategórie',
+        'sync_categories_heading' => 'Stiahnuť aktuálny strom kategórií zo Shoptetu?',
+        'sync_categories_description' => 'Vyber feed s formátom „Shoptet kategórie eshopu". Stiahne sa aktuálny zoznam kategórií, doplnia sa chýbajúce, premenované sa opravia a zmiznuté sa označia ako osirelé.',
         'test_connection' => 'Otestovať spojenie',
         'map_category' => 'Mapovať',
         'map_modal_heading' => 'Mapovanie kategórie „:path"',
@@ -477,6 +493,9 @@ return [
         'auto_map_confirm' => 'Pre každú nenamapovanú kategóriu vybraného dodávateľa sa skúsi nájsť zhodný názov v eshop kategóriách (fuzzy match >= 80 %).',
     ],
     'notifications' => [
+        'sync_categories_done' => 'Synchronizácia kategórií dokončená.',
+        'sync_categories_failed' => 'Synchronizácia kategórií zlyhala.',
+        'sync_categories_no_config' => 'Nebol vybraný platný feed s kategóriami.',
         'import_done_title' => 'Import dokončený',
         'import_done_body' => 'Nájdené :found, nové :new, aktualizované :updated, chyby :failed.',
         'import_failed_title' => 'Import zlyhal',

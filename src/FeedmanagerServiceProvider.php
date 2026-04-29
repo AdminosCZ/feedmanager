@@ -10,7 +10,9 @@ use Adminos\Modules\Feedmanager\Services\FeedDownloader;
 use Adminos\Modules\Feedmanager\Services\FeedExplorerService;
 use Adminos\Modules\Feedmanager\Services\FeedImporter;
 use Adminos\Modules\Feedmanager\Services\Parsing\FeedParserFactory;
+use Adminos\Modules\Feedmanager\Services\Parsing\ShoptetCategoriesParser;
 use Adminos\Modules\Feedmanager\Services\RuleEngine\RuleEngine;
+use Adminos\Modules\Feedmanager\Services\ShoptetCategorySyncService;
 use Illuminate\Http\Client\Factory as HttpFactory;
 use Illuminate\Support\ServiceProvider;
 
@@ -29,6 +31,8 @@ final class FeedmanagerServiceProvider extends ServiceProvider
             FeedExplorerService::class,
             fn ($app) => new FeedExplorerService($app->make(HttpFactory::class), $app->make(FeedParserFactory::class)),
         );
+        $this->app->singleton(ShoptetCategoriesParser::class);
+        $this->app->singleton(ShoptetCategorySyncService::class);
         $this->app->singleton(FeedImporter::class);
     }
 

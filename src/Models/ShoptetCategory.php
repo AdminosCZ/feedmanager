@@ -19,6 +19,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property string|null $full_path
  * @property int $depth
  * @property \Illuminate\Support\Carbon|null $synced_at
+ * @property bool $is_orphaned
  *
  * @api
  */
@@ -28,6 +29,10 @@ final class ShoptetCategory extends Model
 
     protected $guarded = ['id'];
 
+    protected $attributes = [
+        'is_orphaned' => false,
+    ];
+
     protected $casts = [
         'shoptet_id' => 'integer',
         'parent_shoptet_id' => 'integer',
@@ -35,6 +40,7 @@ final class ShoptetCategory extends Model
         'visible' => 'boolean',
         'depth' => 'integer',
         'synced_at' => 'datetime',
+        'is_orphaned' => 'boolean',
     ];
 
     /**

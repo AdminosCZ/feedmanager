@@ -38,11 +38,19 @@ class FeedImporter
         private readonly FeedParserFactory $parsers,
         private readonly RuleEngine $rules,
         private readonly CategoryMappingService $categoryMappings,
+        private readonly ShoptetCategorySyncService $categorySync,
     ) {
     }
 
     public function run(FeedConfig $config, string $triggeredBy = ImportLog::TRIGGER_MANUAL): ImportLog
     {
+        // Category-tree feeds run a completely different pipeline than product
+        // feeds — different parser, different target table, different post-
+        // processing. Delegate.
+        if ($config->isCategoryFeed()) {
+            return $this->categorySync->run($config, $triggeredBy);
+        }
+
         $startedAt = now();
 
         $config->forceFill([

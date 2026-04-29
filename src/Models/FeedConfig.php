@@ -36,6 +36,8 @@ final class FeedConfig extends Model
 
     public const FORMAT_SHOPTET_STOCK_CSV = 'shoptet_stock_csv';
 
+    public const FORMAT_SHOPTET_CATEGORIES = 'shoptet_categories';
+
     public const FORMAT_CUSTOM = 'custom';
 
     /** @var array<int, string> */
@@ -45,8 +47,18 @@ final class FeedConfig extends Model
         self::FORMAT_SHOPTET,
         self::FORMAT_ZBOZI,
         self::FORMAT_SHOPTET_STOCK_CSV,
+        self::FORMAT_SHOPTET_CATEGORIES,
         self::FORMAT_CUSTOM,
     ];
+
+    /**
+     * Whether this feed config produces a category tree rather than a product
+     * list. Routed by FeedImporter to ShoptetCategorySyncService.
+     */
+    public function isCategoryFeed(): bool
+    {
+        return $this->format === self::FORMAT_SHOPTET_CATEGORIES;
+    }
 
     public const STATUS_SUCCESS = 'success';
 

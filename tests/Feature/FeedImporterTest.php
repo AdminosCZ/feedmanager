@@ -14,7 +14,9 @@ use Adminos\Modules\Feedmanager\Services\CategoryMappingService;
 use Adminos\Modules\Feedmanager\Services\FeedDownloader;
 use Adminos\Modules\Feedmanager\Services\FeedImporter;
 use Adminos\Modules\Feedmanager\Services\Parsing\FeedParserFactory;
+use Adminos\Modules\Feedmanager\Services\Parsing\ShoptetCategoriesParser;
 use Adminos\Modules\Feedmanager\Services\RuleEngine\RuleEngine;
+use Adminos\Modules\Feedmanager\Services\ShoptetCategorySyncService;
 use Adminos\Modules\Feedmanager\Tests\TestCase;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use RuntimeException;
@@ -751,6 +753,12 @@ XML;
             }
         };
 
-        return new FeedImporter($downloader, new FeedParserFactory(), new RuleEngine(), new CategoryMappingService());
+        return new FeedImporter(
+            $downloader,
+            new FeedParserFactory(),
+            new RuleEngine(),
+            new CategoryMappingService(),
+            new ShoptetCategorySyncService($downloader, new ShoptetCategoriesParser()),
+        );
     }
 }

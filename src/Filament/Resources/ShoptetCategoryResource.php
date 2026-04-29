@@ -19,6 +19,7 @@ use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 
 /**
@@ -52,6 +53,18 @@ final class ShoptetCategoryResource extends Resource
     public static function getNavigationGroup(): ?string
     {
         return __('feedmanager::feedmanager.navigation.group');
+    }
+
+    public static function getNavigationBadge(): ?string
+    {
+        $count = ShoptetCategory::query()->where('is_orphaned', true)->count();
+
+        return $count > 0 ? (string) $count : null;
+    }
+
+    public static function getNavigationBadgeColor(): ?string
+    {
+        return 'warning';
     }
 
     public static function form(Schema $schema): Schema
@@ -103,12 +116,28 @@ final class ShoptetCategoryResource extends Resource
                     ->toggleable(),
                 IconColumn::make('visible')
                     ->label(__('feedmanager::feedmanager.fields.visible'))
-                    ->boolean(),
+                    ->boolean()
+                    ->toggleable(),
+                TextColumn::make('is_orphaned')
+                    ->label(__('feedmanager::feedmanager.fields.orphaned_short'))
+                    ->badge()
+                    ->state(fn (ShoptetCategory $r): string => $r->is_orphaned ? 'orphaned' : 'present')
+                    ->color(fn (string $state): string => $state === 'orphaned' ? 'danger' : 'success')
+                    ->formatStateUsing(fn (string $state): string => __(
+                        'feedmanager::feedmanager.shoptet_categories.orphan_state.'.$state,
+                    ))
+                    ->toggleable(),
                 TextColumn::make('synced_at')
                     ->label(__('feedmanager::feedmanager.fields.synced_at'))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(),
+            ])
+            ->filters([
+                TernaryFilter::make('is_orphaned')
+                    ->label(__('feedmanager::feedmanager.fields.orphaned_short')),
+                TernaryFilter::make('visible')
+                    ->label(__('feedmanager::feedmanager.fields.visible')),
             ])
             ->recordActions([EditAction::make()])
             ->toolbarActions([
