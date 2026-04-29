@@ -38,6 +38,8 @@ return [
         ],
         'gallery' => 'Image gallery',
         'parameters' => 'Parameters',
+        'b2b_paused_hint' => 'Paused via the "Pro partnery" tab. The product is held back from the partner feed but stays in the catalogue. Resume by toggling on the "Pro partnery" tab.',
+        'b2b_active_hint' => 'Active in the partner feed.',
         'tabs' => [
             'own' => 'Own catalogue',
             'external' => 'From suppliers',
@@ -267,6 +269,7 @@ return [
         'image_short' => 'IMG',
         'status_short' => 'Status',
         'is_b2b_allowed_short' => 'B2B',
+        'b2b_active_short' => 'Active',
         'stock_status' => 'Stock status',
         'supplier_stock' => 'Supplier stock',
         'availability_short' => 'Availability',
@@ -462,6 +465,8 @@ return [
 
         'bulk_add_to_b2b' => 'Bulk add to B2B',
         'bulk_remove_from_b2b' => 'Bulk remove from B2B',
+        'bulk_pause_b2b' => 'Bulk pause for partners',
+        'bulk_resume_b2b' => 'Bulk resume for partners',
         'bulk_approve' => 'Bulk approve',
         'bulk_reject' => 'Bulk reject',
 
@@ -488,6 +493,8 @@ return [
         'included' => 'Product included in exports.',
 
         'bulk_b2b_added' => ':count products added to B2B.',
+        'bulk_b2b_paused' => ':count products paused for partners.',
+        'bulk_b2b_resumed' => ':count products resumed for partners.',
         'bulk_b2b_removed' => ':count products removed from B2B.',
         'bulk_approved' => ':count products approved.',
         'bulk_rejected' => ':count products rejected.',

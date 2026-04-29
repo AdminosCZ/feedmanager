@@ -38,6 +38,8 @@ return [
         ],
         'gallery' => 'Galerie obrázků',
         'parameters' => 'Parametry',
+        'b2b_paused_hint' => 'Pozastaveno na záložce „Pro partnery". Produkt se nepošle partnerovi do feedu, ale zůstává v katalogu. Obnovit lze přepnutím přepínače na záložce „Pro partnery".',
+        'b2b_active_hint' => 'Aktivní v partnerském feedu.',
         'tabs' => [
             'own' => 'Vlastní katalog',
             'external' => 'Od dodavatelů',
@@ -267,6 +269,7 @@ return [
         'image_short' => 'IMG',
         'status_short' => 'Stav',
         'is_b2b_allowed_short' => 'B2B',
+        'b2b_active_short' => 'Aktivní',
         'stock_status' => 'Stav skladu',
         'supplier_stock' => 'Sklad dodavatele',
         'availability_short' => 'Dostupnost',
@@ -462,6 +465,8 @@ return [
 
         'bulk_add_to_b2b' => 'Hromadně přidat do B2B',
         'bulk_remove_from_b2b' => 'Hromadně odebrat z B2B',
+        'bulk_pause_b2b' => 'Hromadně pozastavit pro partnery',
+        'bulk_resume_b2b' => 'Hromadně obnovit pro partnery',
         'bulk_approve' => 'Hromadně schválit',
         'bulk_reject' => 'Hromadně zamítnout',
 
@@ -489,6 +494,8 @@ return [
 
         'bulk_b2b_added' => ':count produktů přidáno do B2B.',
         'bulk_b2b_removed' => ':count produktů odebráno z B2B.',
+        'bulk_b2b_paused' => ':count produktů pozastaveno pro partnery.',
+        'bulk_b2b_resumed' => ':count produktů obnoveno pro partnery.',
         'bulk_approved' => ':count produktů schváleno.',
         'bulk_rejected' => ':count produktů zamítnuto.',
 

@@ -32,6 +32,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property string|null $category_text
  * @property string|null $complete_path
  * @property bool $is_b2b_allowed
+ * @property bool $is_b2b_paused
  * @property bool $is_excluded
  * @property string|null $override_name
  * @property string|null $override_description
@@ -59,6 +60,7 @@ final class Product extends Model
     protected $attributes = [
         'status' => self::STATUS_PENDING,
         'is_b2b_allowed' => true,
+        'is_b2b_paused' => false,
         'is_excluded' => false,
         'currency' => 'CZK',
     ];
@@ -70,12 +72,26 @@ final class Product extends Model
         'override_price_vat' => 'decimal:4',
         'stock_quantity' => 'integer',
         'is_b2b_allowed' => 'boolean',
+        'is_b2b_paused' => 'boolean',
         'is_excluded' => 'boolean',
         'b2b_low_stock_threshold' => 'integer',
         'delivery_date' => 'date',
         'imported_at' => 'datetime',
         'locked_fields' => 'array',
     ];
+
+    /**
+     * Whether this product is currently emitted into the B2B partner feed.
+     * Both gates must be open: the master eligibility flag (set on the
+     * "Vlastní katalog" tab) and the temporary pause flag (set on the "Pro
+     * partnery" tab) must be in their respective feed-on positions.
+     */
+    public function isInB2bFeed(): bool
+    {
+        return $this->is_b2b_allowed === true
+            && $this->is_b2b_paused === false
+            && $this->is_excluded === false;
+    }
 
     /**
      * Effective name — prefers manual override, falls back to imported value.

@@ -126,17 +126,44 @@ final class ProductsTable
                     ->toggleable()
                     ->visible(fn ($livewire): bool => self::activeTab($livewire) !== 'partners'),
 
+                // Master B2B eligibility toggle — visible on Vlastní katalog
+                // and Vše. Turning it off permanently excludes the product
+                // from the partner feed AND removes it from the Pro partnery
+                // tab. The colour reflects the *effective* feed state:
+                // green only when both gates (allowed + not paused) are open;
+                // red also when the product is allowed but currently paused
+                // from the Pro partnery tab. Tooltip explains.
                 ToggleColumn::make('is_b2b_allowed')
                     ->label(__('feedmanager::feedmanager.fields.is_b2b_allowed_short'))
+                    ->onColor(fn (Product $record): string => $record->is_b2b_paused ? 'danger' : 'success')
+                    ->offColor('danger')
+                    ->inline()
+                    ->toggleable()
+                    ->tooltip(fn (Product $record): ?string => $record->is_b2b_allowed && $record->is_b2b_paused
+                        ? __('feedmanager::feedmanager.products.b2b_paused_hint')
+                        : null)
+                    // B2B toggle is only meaningful when the catalogue is
+                    // headed for B2B partner export. The "Od dodavatelů"
+                    // tab is about Shoptet auto-import curation, where B2B
+                    // is a downstream concern. The "Pro partnery" tab gets
+                    // its own pause-style toggle.
+                    ->visible(fn ($livewire): bool => ! in_array(self::activeTab($livewire), ['external', 'partners'], true)),
+
+                // Pause / resume toggle — only on the Pro partnery tab.
+                // State is the *negation* of `is_b2b_paused` so green = active
+                // (in feed), red = paused (out of feed but still listed here).
+                ToggleColumn::make('b2b_active')
+                    ->label(__('feedmanager::feedmanager.fields.b2b_active_short'))
+                    ->getStateUsing(fn (Product $record): bool => ! $record->is_b2b_paused)
+                    ->updateStateUsing(fn (Product $record, $state): bool => $record->update(['is_b2b_paused' => ! $state]))
                     ->onColor('success')
                     ->offColor('danger')
                     ->inline()
                     ->toggleable()
-                    // B2B toggle is only meaningful when the catalogue is
-                    // headed for B2B partner export. The "Od dodavatelů"
-                    // tab is about Shoptet auto-import curation, where B2B
-                    // is a downstream concern.
-                    ->visible(fn ($livewire): bool => self::activeTab($livewire) !== 'external'),
+                    ->tooltip(fn (Product $record): ?string => $record->is_b2b_paused
+                        ? __('feedmanager::feedmanager.products.b2b_paused_hint')
+                        : __('feedmanager::feedmanager.products.b2b_active_hint'))
+                    ->visible(fn ($livewire): bool => self::activeTab($livewire) === 'partners'),
 
                 TextColumn::make('updated_at')
                     ->label(__('feedmanager::feedmanager.fields.updated_at'))
@@ -168,7 +195,12 @@ final class ProductsTable
                         ->icon('heroicon-o-check-circle')
                         ->color('success')
                         ->action(function (Collection $records): void {
-                            $records->each(fn (Product $r) => $r->update(['is_b2b_allowed' => true]));
+                            // Re-enabling clears the temporary pause too —
+                            // explicit "back into the feed" gesture.
+                            $records->each(fn (Product $r) => $r->update([
+                                'is_b2b_allowed' => true,
+                                'is_b2b_paused' => false,
+                            ]));
                             Notification::make()
                                 ->title(__('feedmanager::feedmanager.notifications.bulk_b2b_added', ['count' => $records->count()]))
                                 ->success()
@@ -182,6 +214,28 @@ final class ProductsTable
                             $records->each(fn (Product $r) => $r->update(['is_b2b_allowed' => false]));
                             Notification::make()
                                 ->title(__('feedmanager::feedmanager.notifications.bulk_b2b_removed', ['count' => $records->count()]))
+                                ->success()
+                                ->send();
+                        }),
+                    BulkAction::make('pause_b2b')
+                        ->label(__('feedmanager::feedmanager.actions.bulk_pause_b2b'))
+                        ->icon('heroicon-o-pause-circle')
+                        ->color('warning')
+                        ->action(function (Collection $records): void {
+                            $records->each(fn (Product $r) => $r->update(['is_b2b_paused' => true]));
+                            Notification::make()
+                                ->title(__('feedmanager::feedmanager.notifications.bulk_b2b_paused', ['count' => $records->count()]))
+                                ->warning()
+                                ->send();
+                        }),
+                    BulkAction::make('resume_b2b')
+                        ->label(__('feedmanager::feedmanager.actions.bulk_resume_b2b'))
+                        ->icon('heroicon-o-play-circle')
+                        ->color('success')
+                        ->action(function (Collection $records): void {
+                            $records->each(fn (Product $r) => $r->update(['is_b2b_paused' => false]));
+                            Notification::make()
+                                ->title(__('feedmanager::feedmanager.notifications.bulk_b2b_resumed', ['count' => $records->count()]))
                                 ->success()
                                 ->send();
                         }),

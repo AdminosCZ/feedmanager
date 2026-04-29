@@ -38,6 +38,8 @@ return [
         ],
         'gallery' => 'Galéria obrázkov',
         'parameters' => 'Parametre',
+        'b2b_paused_hint' => 'Pozastavené na záložke „Pre partnerov". Produkt sa nepošle partnerovi do feedu, ale zostáva v katalógu. Obnoviť možno prepnutím prepínača na záložke „Pre partnerov".',
+        'b2b_active_hint' => 'Aktívny v partnerskom feede.',
         'tabs' => [
             'own' => 'Vlastný katalóg',
             'external' => 'Od dodávateľov',
@@ -267,6 +269,7 @@ return [
         'image_short' => 'IMG',
         'status_short' => 'Stav',
         'is_b2b_allowed_short' => 'B2B',
+        'b2b_active_short' => 'Aktívny',
         'stock_status' => 'Stav skladu',
         'supplier_stock' => 'Sklad dodávateľa',
         'availability_short' => 'Dostupnosť',
@@ -462,6 +465,8 @@ return [
 
         'bulk_add_to_b2b' => 'Hromadne pridať do B2B',
         'bulk_remove_from_b2b' => 'Hromadne odobrať z B2B',
+        'bulk_pause_b2b' => 'Hromadne pozastaviť pre partnerov',
+        'bulk_resume_b2b' => 'Hromadne obnoviť pre partnerov',
         'bulk_approve' => 'Hromadne schváliť',
         'bulk_reject' => 'Hromadne zamietnuť',
 
@@ -488,6 +493,8 @@ return [
         'included' => 'Produkt zaradený do exportov.',
 
         'bulk_b2b_added' => ':count produktov pridaných do B2B.',
+        'bulk_b2b_paused' => ':count produktov pozastavených pre partnerov.',
+        'bulk_b2b_resumed' => ':count produktov obnovených pre partnerov.',
         'bulk_b2b_removed' => ':count produktov odobratých z B2B.',
         'bulk_approved' => ':count produktov schválených.',
         'bulk_rejected' => ':count produktov zamietnutých.',
