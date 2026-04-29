@@ -107,12 +107,29 @@ return [
         'label' => 'Supplier',
         'plural_label' => 'Suppliers',
         'navigation_label' => 'Suppliers',
+        'sections' => [
+            'identity' => 'Identity',
+            'feeds' => 'Inbound feeds',
+            'notes' => 'Notes',
+        ],
         'kind' => [
             'own' => 'Own eshop',
             'external' => 'Supplier',
             'own_prefix' => '🏠',
             'external_prefix' => '📦',
         ],
+        'last_sync_status' => [
+            'success' => 'OK',
+            'failed' => 'Failed',
+            'none' => 'No imports',
+        ],
+        'feed_kind' => [
+            'primary' => 'Primary catalogue',
+            'supplemental' => 'Supplemental',
+            'categories' => 'Categories',
+        ],
+        'no_feeds' => 'This supplier has no feeds configured.',
+        'no_notes' => '— no note —',
     ],
     'suppliers_overview' => [
         'approved_products' => 'Approved products',
@@ -358,6 +375,11 @@ return [
         'is_active' => 'Active',
         'feed_configs_count' => 'Feeds',
         'products_count' => 'Products',
+        'product_preview' => 'Preview',
+        'approved_products_count' => 'Approved',
+        'pending_products_count' => 'To review',
+        'total_products_count' => 'Total',
+        'supplemental_feeds_count' => 'Supplemental imports',
 
         'feed_config_name' => 'Feed name',
         'supplier' => 'Supplier',
@@ -486,6 +508,7 @@ return [
         'regenerate_hash_confirm_heading' => 'Regenerate the outbound feed hash?',
         'regenerate_hash_confirm' => 'The current URL stops working. Recipients (Heuréka, Shoptet) will need the new URL.',
 
+        'details' => 'Details',
         'enable_feeds' => 'Enable feeds',
         'disable_feeds' => 'Disable feeds',
         'add_to_b2b' => 'Add to B2B',

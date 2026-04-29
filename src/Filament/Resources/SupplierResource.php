@@ -7,14 +7,17 @@ namespace Adminos\Modules\Feedmanager\Filament\Resources;
 use Adminos\Modules\Feedmanager\Filament\Resources\Suppliers\Pages\CreateSupplier;
 use Adminos\Modules\Feedmanager\Filament\Resources\Suppliers\Pages\EditSupplier;
 use Adminos\Modules\Feedmanager\Filament\Resources\Suppliers\Pages\ListSuppliers;
+use Adminos\Modules\Feedmanager\Filament\Resources\Suppliers\Pages\ViewSupplier;
 use Adminos\Modules\Feedmanager\Filament\Resources\Suppliers\Schemas\SupplierForm;
 use Adminos\Modules\Feedmanager\Filament\Resources\Suppliers\Tables\SuppliersTable;
 use Adminos\Modules\Feedmanager\Models\Supplier;
+use Adminos\Modules\Feedmanager\Models\Product;
 use BackedEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 
 /**
  * @api
@@ -64,11 +67,30 @@ final class SupplierResource extends Resource
         return [];
     }
 
+    /**
+     * Aggregated counts surfaced on the Dodavatelé list — schválené /
+     * ke kontrole / celkem produktů + počet doplňkových (parameters /
+     * stock-supplement) feedů.
+     */
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()->withCount([
+            'products as approved_products_count' => fn (Builder $q) => $q->where('status', Product::STATUS_APPROVED),
+            'products as pending_products_count' => fn (Builder $q) => $q->where('status', Product::STATUS_PENDING),
+            'products as total_products_count',
+            'feedConfigs as supplemental_feeds_count' => fn (Builder $q) => $q->where(
+                fn (Builder $q2) => $q2->where('import_parameters_only', true)
+                    ->orWhere('update_only_mode', true),
+            ),
+        ]);
+    }
+
     public static function getPages(): array
     {
         return [
             'index' => ListSuppliers::route('/'),
             'create' => CreateSupplier::route('/create'),
+            'view' => ViewSupplier::route('/{record}'),
             'edit' => EditSupplier::route('/{record}/edit'),
         ];
     }

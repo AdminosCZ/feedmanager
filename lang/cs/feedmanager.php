@@ -107,12 +107,29 @@ return [
         'label' => 'Dodavatel',
         'plural_label' => 'Dodavatelé',
         'navigation_label' => 'Dodavatelé',
+        'sections' => [
+            'identity' => 'Identifikace',
+            'feeds' => 'Vstupní feedy',
+            'notes' => 'Poznámky',
+        ],
         'kind' => [
             'own' => 'Vlastní eshop',
             'external' => 'Dodavatel',
             'own_prefix' => '🏠',
             'external_prefix' => '📦',
         ],
+        'last_sync_status' => [
+            'success' => 'Úspěch',
+            'failed' => 'Chyba',
+            'none' => 'Bez importu',
+        ],
+        'feed_kind' => [
+            'primary' => 'Primární katalog',
+            'supplemental' => 'Doplňkový',
+            'categories' => 'Kategorie',
+        ],
+        'no_feeds' => 'Tento dodavatel nemá nastavené žádné feedy.',
+        'no_notes' => '— bez poznámky —',
     ],
     'suppliers_overview' => [
         'approved_products' => 'Schválené produkty',
@@ -358,6 +375,11 @@ return [
         'is_active' => 'Aktivní',
         'feed_configs_count' => 'Počet feedů',
         'products_count' => 'Počet produktů',
+        'product_preview' => 'Náhled produktů',
+        'approved_products_count' => 'Schválených',
+        'pending_products_count' => 'Ke kontrole',
+        'total_products_count' => 'Celkem',
+        'supplemental_feeds_count' => 'Doplňkových importů',
 
         'feed_config_name' => 'Název feedu',
         'supplier' => 'Dodavatel',
@@ -486,6 +508,7 @@ return [
         'regenerate_hash_confirm_heading' => 'Regenerovat hash výstupního feedu?',
         'regenerate_hash_confirm' => 'Stávající URL přestane fungovat. Příjemcům (Heuréka, Shoptet) bude potřeba poslat novou URL.',
 
+        'details' => 'Detaily',
         'enable_feeds' => 'Zapnout feedy',
         'disable_feeds' => 'Vypnout feedy',
         'add_to_b2b' => 'Přidat do B2B',
