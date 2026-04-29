@@ -140,6 +140,7 @@ return [
             'orphan_summary' => ':count orphaned',
             'mapped_suppliers' => ':count paired sources',
             'orphaned_hint' => 'This category disappeared from Shoptet — any supplier mappings need to be re-paired.',
+            'visible_in_shop' => 'Visible in the shop',
             'hidden_in_shop' => 'Hidden in the shop',
         ],
         'notify' => [

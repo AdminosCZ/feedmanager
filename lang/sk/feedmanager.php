@@ -140,6 +140,7 @@ return [
             'orphan_summary' => ':count osirelých',
             'mapped_suppliers' => ':count napárovaných zdrojov',
             'orphaned_hint' => 'Kategória zmizla zo Shoptetu — prípadné mapovanie dodávateľských kategórií treba prepárovať.',
+            'visible_in_shop' => 'V eshope viditeľná',
             'hidden_in_shop' => 'V eshope skrytá',
         ],
         'notify' => [

@@ -102,6 +102,36 @@
                 color: rgb(241 241 241);
             }
 
+            .fi-fl-tree-link-text {
+                margin-left: 0.375rem;
+                color: rgb(148 163 184);
+                font-weight: 400;
+                font-size: 0.8125rem;
+            }
+            .dark .fi-fl-tree-link-text {
+                color: rgb(100 116 139);
+            }
+
+            .fi-fl-tree-visibility {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                width: 1rem;
+                height: 1rem;
+                flex: none;
+            }
+            .fi-fl-tree-visibility svg {
+                width: 0.875rem;
+                height: 0.875rem;
+            }
+            .fi-fl-tree-visibility--on {
+                color: rgb(34 197 94); /* success green — matches Apple-vibe success */
+            }
+            .fi-fl-tree-visibility--off {
+                color: rgb(235 65 67); /* danger red — matches Apple-vibe danger */
+                opacity: 0.85;
+            }
+
             .fi-fl-tree-badge {
                 display: inline-flex;
                 align-items: center;
