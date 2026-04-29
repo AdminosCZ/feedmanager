@@ -57,6 +57,7 @@ return [
             'count_pieces' => ':count ks',
             'count_unknown' => 'počet neznámy',
         ],
+        'partner_tooltip' => 'Skutočný stav: :count. Threshold pre túto úroveň: :threshold ks.',
     ],
     'shoptet_exports' => [
         'label' => 'Shoptet auto-import',

@@ -57,6 +57,7 @@ return [
             'count_pieces' => ':count pcs',
             'count_unknown' => 'count unknown',
         ],
+        'partner_tooltip' => 'Real stock: :count. Threshold for this tier: :threshold pcs.',
     ],
     'shoptet_exports' => [
         'label' => 'Shoptet auto-import',

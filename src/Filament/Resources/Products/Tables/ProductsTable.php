@@ -21,6 +21,17 @@ use Illuminate\Database\Eloquent\Collection;
 
 final class ProductsTable
 {
+    /**
+     * Tier-level low-stock thresholds — used for the "Pro partnery" tab
+     * preview where no single partner is selected. Mirrors
+     * `Partner::TIER_DEFAULT_THRESHOLDS` in feedmanager-pro; kept here so
+     * the base package doesn't take a hard dependency on PRO.
+     */
+    private const TIER_DEFAULT_THRESHOLDS = [
+        'standard' => 5,
+        'vip' => 2,
+    ];
+
     public static function configure(Table $table): Table
     {
         return $table
@@ -55,27 +66,45 @@ final class ProductsTable
                     ->sortable()
                     ->alignEnd(),
 
-                // Computed availability badge — what a typical (standard)
-                // partner would see for this product based on the stock
-                // count + default low-stock threshold (5). VIP / per-product
-                // overrides happen at export time, this column is the
-                // at-a-glance approximation. Tooltip on hover discloses
-                // the actual source (Markstore vs Dodavatel X) + raw count
-                // so the admin knows where the "Skladem" came from.
-                TextColumn::make('availability_badge')
+                // E-shop availability (no B2B threshold) — what the client's
+                // own front-end shows to its end customers. Hidden on the
+                // "Pro partnery" tab where the per-tier preview takes over.
+                TextColumn::make('availability_eshop')
                     ->label(__('feedmanager::feedmanager.fields.availability_short'))
-                    ->state(fn (Product $record): string => self::availabilityKey($record))
+                    ->state(fn (Product $record): string => self::eshopAvailabilityKey($record))
                     ->badge()
-                    ->color(fn (string $state): string => match ($state) {
-                        'in_stock' => 'success',
-                        'on_request' => 'warning',
-                        'out_of_stock' => 'danger',
-                        default => 'gray',
-                    })
+                    ->color(fn (string $state): string => self::availabilityColor($state))
                     ->formatStateUsing(fn (string $state): string => __(
-                        'feedmanager::feedmanager.products.availability.' . $state,
+                        'feedmanager::feedmanager.products.availability.'.$state,
                     ))
-                    ->tooltip(fn (Product $record): string => self::availabilityTooltip($record)),
+                    ->tooltip(fn (Product $record): string => self::eshopTooltip($record))
+                    ->visible(fn ($livewire): bool => self::activeTab($livewire) !== 'partners'),
+
+                // Standard partner preview — applies tier-default low-stock
+                // threshold (5 ks) plus per-product floor.
+                TextColumn::make('availability_standard')
+                    ->label(__('feedmanager::feedmanager.partners.tier.standard'))
+                    ->state(fn (Product $record): string => self::partnerAvailabilityKey($record, 'standard'))
+                    ->badge()
+                    ->color(fn (string $state): string => self::availabilityColor($state))
+                    ->formatStateUsing(fn (string $state): string => __(
+                        'feedmanager::feedmanager.products.availability.'.$state,
+                    ))
+                    ->tooltip(fn (Product $record): string => self::partnerTooltip($record, 'standard'))
+                    ->visible(fn ($livewire): bool => self::activeTab($livewire) === 'partners'),
+
+                // VIP partner preview — tier-default threshold is lower
+                // (2 ks), so VIP can see smaller stocks as "Skladem".
+                TextColumn::make('availability_vip')
+                    ->label(__('feedmanager::feedmanager.partners.tier.vip'))
+                    ->state(fn (Product $record): string => self::partnerAvailabilityKey($record, 'vip'))
+                    ->badge()
+                    ->color(fn (string $state): string => self::availabilityColor($state))
+                    ->formatStateUsing(fn (string $state): string => __(
+                        'feedmanager::feedmanager.products.availability.'.$state,
+                    ))
+                    ->tooltip(fn (Product $record): string => self::partnerTooltip($record, 'vip'))
+                    ->visible(fn ($livewire): bool => self::activeTab($livewire) === 'partners'),
 
                 TextColumn::make('status')
                     ->label(__('feedmanager::feedmanager.fields.status_short'))
@@ -85,7 +114,7 @@ final class ProductsTable
                         Product::STATUS_REJECTED => 'danger',
                         default => 'warning',
                     })
-                    ->formatStateUsing(fn (string $state): string => __('feedmanager::feedmanager.products.status.' . $state)),
+                    ->formatStateUsing(fn (string $state): string => __('feedmanager::feedmanager.products.status.'.$state)),
 
                 ToggleColumn::make('is_b2b_allowed')
                     ->label(__('feedmanager::feedmanager.fields.is_b2b_allowed_short'))
@@ -196,15 +225,44 @@ final class ProductsTable
         };
     }
 
+    private static function availabilityColor(string $state): string
+    {
+        return match ($state) {
+            'in_stock' => 'success',
+            'on_request' => 'warning',
+            'out_of_stock' => 'danger',
+            default => 'gray',
+        };
+    }
+
     /**
-     * Map a product to one of the partner-visible availability buckets.
-     * Mirrors the default logic in B2bFeedExporter (PR 9):
-     *   stock = 0           → out_of_stock
-     *   stock <= 5          → on_request   (low-stock threshold default)
-     *   stock > 5           → in_stock
-     *   stock = null + text → unknown      (TODO: PR C — supplier mapping)
+     * E-shop view: what the client's own front-end shows to its end
+     * customers. NO B2B threshold applied.
+     *
+     *   stock = 0  → out_of_stock
+     *   stock > 0  → in_stock
+     *   stock null + availability text → in_stock (text-only feeds)
+     *   stock null + no text           → unknown
      */
-    private static function availabilityKey(Product $record): string
+    private static function eshopAvailabilityKey(Product $record): string
+    {
+        $stock = $record->stock_quantity;
+
+        if ($stock === null) {
+            return ($record->availability !== null && $record->availability !== '')
+                ? 'in_stock'
+                : 'unknown';
+        }
+
+        return $stock > 0 ? 'in_stock' : 'out_of_stock';
+    }
+
+    /**
+     * Partner-tier view: applies the tier's default low-stock threshold
+     * plus the per-product floor (max of the two), mirrors the logic in
+     * B2bFeedExporter::resolveStockVisibility().
+     */
+    private static function partnerAvailabilityKey(Product $record, string $tier): string
     {
         $stock = $record->stock_quantity;
 
@@ -212,11 +270,14 @@ final class ProductsTable
             return 'unknown';
         }
 
-        if ($stock === 0) {
+        if ($stock <= 0) {
             return 'out_of_stock';
         }
 
-        if ($stock <= 5) {
+        $tierThreshold = self::TIER_DEFAULT_THRESHOLDS[$tier] ?? 0;
+        $effective = max($tierThreshold, (int) ($record->b2b_low_stock_threshold ?? 0));
+
+        if ($effective > 0 && $stock <= $effective) {
             return 'on_request';
         }
 
@@ -224,15 +285,10 @@ final class ProductsTable
     }
 
     /**
-     * Disclose the source behind the partner-visible badge:
-     *   "u Markstore (10 ks)"               own eshop, count known
-     *   "u Velkoobchod XYZ (5 ks)"          external supplier, count known
-     *   "u Velkoobchod XYZ (počet neznámý)" external, count unknown
-     *
-     * The supplier name itself comes from Supplier::name; is_own decides
-     * whether to label it as own catalogue or external.
+     * Tooltip on the e-shop availability badge — discloses real source +
+     * raw stock count (no threshold games on this tab).
      */
-    private static function availabilityTooltip(Product $record): string
+    private static function eshopTooltip(Product $record): string
     {
         $supplier = $record->supplier;
 
@@ -246,6 +302,25 @@ final class ProductsTable
             ? __('feedmanager::feedmanager.products.source.count_unknown')
             : __('feedmanager::feedmanager.products.source.count_pieces', ['count' => $record->stock_quantity]);
 
-        return $sourceLabel . ' — ' . $countLabel;
+        return $sourceLabel.' — '.$countLabel;
+    }
+
+    /**
+     * Tooltip on the partner-tier badge — explains why the tier sees what
+     * it sees (real count + applied threshold).
+     */
+    private static function partnerTooltip(Product $record, string $tier): string
+    {
+        $tierThreshold = self::TIER_DEFAULT_THRESHOLDS[$tier] ?? 0;
+        $effective = max($tierThreshold, (int) ($record->b2b_low_stock_threshold ?? 0));
+
+        $countLabel = $record->stock_quantity === null
+            ? __('feedmanager::feedmanager.products.source.count_unknown')
+            : __('feedmanager::feedmanager.products.source.count_pieces', ['count' => $record->stock_quantity]);
+
+        return __('feedmanager::feedmanager.products.partner_tooltip', [
+            'count' => $countLabel,
+            'threshold' => $effective,
+        ]);
     }
 }
