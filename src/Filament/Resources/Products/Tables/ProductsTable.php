@@ -39,7 +39,8 @@ final class ProductsTable
                 ImageColumn::make('image_url')
                     ->label(__('feedmanager::feedmanager.fields.image_short'))
                     ->square()
-                    ->size(48),
+                    ->size(48)
+                    ->toggleable(),
                 TextColumn::make('code')
                     ->label(__('feedmanager::feedmanager.fields.code'))
                     ->searchable()
@@ -54,7 +55,8 @@ final class ProductsTable
                     ->label(__('feedmanager::feedmanager.fields.price_vat'))
                     ->money(fn ($record): string => $record->currency)
                     ->sortable()
-                    ->alignEnd(),
+                    ->alignEnd()
+                    ->toggleable(),
 
                 // Stock count column — labelled as "Stav skladu" on the
                 // own catalogue tab and "Sklad dodavatele" on the supplier
@@ -64,7 +66,8 @@ final class ProductsTable
                     ->label(fn ($livewire): string => self::stockColumnLabel($livewire))
                     ->placeholder('—')
                     ->sortable()
-                    ->alignEnd(),
+                    ->alignEnd()
+                    ->toggleable(),
 
                 // E-shop availability (no B2B threshold) — what the client's
                 // own front-end shows to its end customers. Hidden on the
@@ -78,6 +81,7 @@ final class ProductsTable
                         'feedmanager::feedmanager.products.availability.'.$state,
                     ))
                     ->tooltip(fn (Product $record): string => self::eshopTooltip($record))
+                    ->toggleable()
                     ->visible(fn ($livewire): bool => self::activeTab($livewire) !== 'partners'),
 
                 // Standard partner preview — applies tier-default low-stock
@@ -91,6 +95,7 @@ final class ProductsTable
                         'feedmanager::feedmanager.products.availability.'.$state,
                     ))
                     ->tooltip(fn (Product $record): string => self::partnerTooltip($record, 'standard'))
+                    ->toggleable()
                     ->visible(fn ($livewire): bool => self::activeTab($livewire) === 'partners'),
 
                 // VIP partner preview — tier-default threshold is lower
@@ -104,8 +109,11 @@ final class ProductsTable
                         'feedmanager::feedmanager.products.availability.'.$state,
                     ))
                     ->tooltip(fn (Product $record): string => self::partnerTooltip($record, 'vip'))
+                    ->toggleable()
                     ->visible(fn ($livewire): bool => self::activeTab($livewire) === 'partners'),
 
+                // Approval status — irrelevant on the "Pro partnery" tab
+                // where products are already curated for B2B export.
                 TextColumn::make('status')
                     ->label(__('feedmanager::feedmanager.fields.status_short'))
                     ->badge()
@@ -114,13 +122,16 @@ final class ProductsTable
                         Product::STATUS_REJECTED => 'danger',
                         default => 'warning',
                     })
-                    ->formatStateUsing(fn (string $state): string => __('feedmanager::feedmanager.products.status.'.$state)),
+                    ->formatStateUsing(fn (string $state): string => __('feedmanager::feedmanager.products.status.'.$state))
+                    ->toggleable()
+                    ->visible(fn ($livewire): bool => self::activeTab($livewire) !== 'partners'),
 
                 ToggleColumn::make('is_b2b_allowed')
                     ->label(__('feedmanager::feedmanager.fields.is_b2b_allowed_short'))
                     ->onColor('success')
                     ->offColor('danger')
                     ->inline()
+                    ->toggleable()
                     // B2B toggle is only meaningful when the catalogue is
                     // headed for B2B partner export. The "Od dodavatelů"
                     // tab is about Shoptet auto-import curation, where B2B
