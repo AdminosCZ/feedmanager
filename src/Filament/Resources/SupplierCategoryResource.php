@@ -111,7 +111,7 @@ final class SupplierCategoryResource extends Resource
             ->filters([
                 SelectFilter::make('supplier_id')
                     ->label(__('feedmanager::feedmanager.fields.supplier'))
-                    ->relationship('supplier', 'name', fn ($q) => $q->where('is_own', false)),
+                    ->relationship('supplier', 'name', fn (\Illuminate\Database\Eloquent\Builder $query) => $query->where('is_own', false)),
                 TernaryFilter::make('has_mapping')
                     ->label(__('feedmanager::feedmanager.supplier_categories.filter_has_mapping'))
                     ->placeholder(__('feedmanager::feedmanager.supplier_categories.filter_all'))
@@ -176,7 +176,7 @@ final class SupplierCategoryResource extends Resource
                     ->schema([
                         Select::make('supplier_id')
                             ->label(__('feedmanager::feedmanager.fields.supplier'))
-                            ->relationship('supplier', 'name', fn ($q) => $q->where('is_own', false))
+                            ->relationship('supplier', 'name', fn (\Illuminate\Database\Eloquent\Builder $query) => $query->where('is_own', false))
                             ->required(),
                     ])
                     ->action(function (array $data, CategoryMappingService $service): void {
