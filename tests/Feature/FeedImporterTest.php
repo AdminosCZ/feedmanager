@@ -7,6 +7,8 @@ namespace Adminos\Modules\Feedmanager\Tests\Feature;
 use Adminos\Modules\Feedmanager\Models\FeedConfig;
 use Adminos\Modules\Feedmanager\Models\ImportLog;
 use Adminos\Modules\Feedmanager\Models\Product;
+use Adminos\Modules\Feedmanager\Models\ProductImage;
+use Adminos\Modules\Feedmanager\Models\ProductParameter;
 use Adminos\Modules\Feedmanager\Models\Supplier;
 use Adminos\Modules\Feedmanager\Services\CategoryMappingService;
 use Adminos\Modules\Feedmanager\Services\FeedDownloader;
@@ -174,6 +176,437 @@ final class FeedImporterTest extends TestCase
         $this->assertTrue($product->is_b2b_allowed, 'existing approval must survive re-import');
     }
 
+    public function test_own_eshop_products_land_as_approved(): void
+    {
+        $supplier = Supplier::query()->create([
+            'name' => 'Markstore',
+            'slug' => 'markstore',
+            'is_own' => true,
+        ]);
+        $config = FeedConfig::query()->create([
+            'supplier_id' => $supplier->id,
+            'name' => 'Markstore feed',
+            'source_url' => 'https://example.com/feed.xml',
+            'format' => FeedConfig::FORMAT_HEUREKA,
+        ]);
+
+        $importer = $this->makeImporter($this->fakeFeedXml());
+        $importer->run($config);
+
+        $product = Product::query()->where('code', 'SKU-1')->first();
+        $this->assertSame(Product::STATUS_APPROVED, $product->status);
+    }
+
+    public function test_external_supplier_products_land_as_pending(): void
+    {
+        $supplier = Supplier::query()->create([
+            'name' => 'Velkoobchod',
+            'slug' => 'velkoobchod',
+            'is_own' => false,
+        ]);
+        $config = FeedConfig::query()->create([
+            'supplier_id' => $supplier->id,
+            'name' => 'Velkoobchod feed',
+            'source_url' => 'https://example.com/feed.xml',
+            'format' => FeedConfig::FORMAT_HEUREKA,
+        ]);
+
+        $importer = $this->makeImporter($this->fakeFeedXml());
+        $importer->run($config);
+
+        $product = Product::query()->where('code', 'SKU-1')->first();
+        $this->assertSame(Product::STATUS_PENDING, $product->status);
+    }
+
+    public function test_status_default_does_not_overwrite_existing_status(): void
+    {
+        $supplier = Supplier::query()->create([
+            'name' => 'Velkoobchod',
+            'slug' => 'velkoobchod',
+            'is_own' => false,
+        ]);
+        $config = FeedConfig::query()->create([
+            'supplier_id' => $supplier->id,
+            'name' => 'Velkoobchod feed',
+            'source_url' => 'https://example.com/feed.xml',
+            'format' => FeedConfig::FORMAT_HEUREKA,
+        ]);
+
+        // Admin already approved this product manually.
+        Product::query()->create([
+            'supplier_id' => $supplier->id,
+            'code' => 'SKU-1',
+            'name' => 'Pre-approved',
+            'status' => Product::STATUS_APPROVED,
+        ]);
+
+        $importer = $this->makeImporter($this->fakeFeedXml());
+        $importer->run($config);
+
+        $product = Product::query()->where('code', 'SKU-1')->first();
+        $this->assertSame(Product::STATUS_APPROVED, $product->status, 'manual approval must survive re-import');
+    }
+
+    public function test_imports_gallery_images_alongside_primary(): void
+    {
+        $config = $this->makeConfig();
+
+        $payload = <<<'XML'
+<?xml version="1.0" encoding="UTF-8"?>
+<SHOP>
+  <SHOPITEM>
+    <ITEM_ID>SKU-1</ITEM_ID>
+    <PRODUCTNAME>Demo</PRODUCTNAME>
+    <IMGURL>https://example.com/main.jpg</IMGURL>
+    <IMGURL>https://example.com/alt-1.jpg</IMGURL>
+    <IMGURL_ALTERNATIVE>https://example.com/alt-2.jpg</IMGURL_ALTERNATIVE>
+  </SHOPITEM>
+</SHOP>
+XML;
+
+        $importer = $this->makeImporter($payload);
+        $importer->run($config);
+
+        $product = Product::query()->where('code', 'SKU-1')->first();
+        $this->assertSame('https://example.com/main.jpg', $product->image_url);
+
+        $gallery = ProductImage::query()->where('product_id', $product->id)->orderBy('position')->get();
+        $this->assertCount(2, $gallery);
+        $this->assertSame('https://example.com/alt-1.jpg', $gallery[0]->url);
+        $this->assertSame('https://example.com/alt-2.jpg', $gallery[1]->url);
+        $this->assertSame(1, $gallery[0]->position);
+        $this->assertSame(2, $gallery[1]->position);
+    }
+
+    public function test_gallery_is_replaced_on_re_import(): void
+    {
+        $config = $this->makeConfig();
+
+        $first = <<<'XML'
+<?xml version="1.0" encoding="UTF-8"?>
+<SHOP>
+  <SHOPITEM>
+    <ITEM_ID>SKU-1</ITEM_ID>
+    <PRODUCTNAME>Demo</PRODUCTNAME>
+    <IMGURL>https://example.com/main.jpg</IMGURL>
+    <IMGURL>https://example.com/old-1.jpg</IMGURL>
+    <IMGURL>https://example.com/old-2.jpg</IMGURL>
+  </SHOPITEM>
+</SHOP>
+XML;
+
+        $this->makeImporter($first)->run($config);
+
+        $second = <<<'XML'
+<?xml version="1.0" encoding="UTF-8"?>
+<SHOP>
+  <SHOPITEM>
+    <ITEM_ID>SKU-1</ITEM_ID>
+    <PRODUCTNAME>Demo</PRODUCTNAME>
+    <IMGURL>https://example.com/main.jpg</IMGURL>
+    <IMGURL>https://example.com/new.jpg</IMGURL>
+  </SHOPITEM>
+</SHOP>
+XML;
+
+        $this->makeImporter($second)->run($config);
+
+        $product = Product::query()->where('code', 'SKU-1')->first();
+        $gallery = ProductImage::query()->where('product_id', $product->id)->get();
+
+        $this->assertCount(1, $gallery);
+        $this->assertSame('https://example.com/new.jpg', $gallery[0]->url);
+    }
+
+    public function test_imports_parameters_alongside_product(): void
+    {
+        $config = $this->makeConfig();
+
+        $payload = <<<'XML'
+<?xml version="1.0" encoding="UTF-8"?>
+<SHOP>
+  <SHOPITEM>
+    <ITEM_ID>SKU-1</ITEM_ID>
+    <PRODUCTNAME>Demo</PRODUCTNAME>
+    <PARAM><PARAM_NAME>Barva</PARAM_NAME><VAL>Modrá</VAL></PARAM>
+    <PARAM><PARAM_NAME>Velikost</PARAM_NAME><VAL>XL</VAL></PARAM>
+  </SHOPITEM>
+</SHOP>
+XML;
+
+        $this->makeImporter($payload)->run($config);
+
+        $product = Product::query()->where('code', 'SKU-1')->first();
+        $params = ProductParameter::query()
+            ->where('product_id', $product->id)
+            ->orderBy('position')
+            ->get();
+
+        $this->assertCount(2, $params);
+        $this->assertSame('Barva', $params[0]->name);
+        $this->assertSame('Modrá', $params[0]->value);
+        $this->assertSame('Velikost', $params[1]->name);
+        $this->assertSame('XL', $params[1]->value);
+    }
+
+    public function test_parameters_are_replaced_on_re_import(): void
+    {
+        $config = $this->makeConfig();
+
+        $first = <<<'XML'
+<?xml version="1.0" encoding="UTF-8"?>
+<SHOP>
+  <SHOPITEM>
+    <ITEM_ID>SKU-1</ITEM_ID>
+    <PRODUCTNAME>Demo</PRODUCTNAME>
+    <PARAM><PARAM_NAME>Barva</PARAM_NAME><VAL>Modrá</VAL></PARAM>
+  </SHOPITEM>
+</SHOP>
+XML;
+        $this->makeImporter($first)->run($config);
+
+        $second = <<<'XML'
+<?xml version="1.0" encoding="UTF-8"?>
+<SHOP>
+  <SHOPITEM>
+    <ITEM_ID>SKU-1</ITEM_ID>
+    <PRODUCTNAME>Demo</PRODUCTNAME>
+    <PARAM><PARAM_NAME>Velikost</PARAM_NAME><VAL>XXL</VAL></PARAM>
+  </SHOPITEM>
+</SHOP>
+XML;
+        $this->makeImporter($second)->run($config);
+
+        $product = Product::query()->where('code', 'SKU-1')->first();
+        $params = ProductParameter::query()->where('product_id', $product->id)->get();
+
+        $this->assertCount(1, $params);
+        $this->assertSame('Velikost', $params[0]->name);
+    }
+
+    public function test_parameters_are_left_alone_when_feed_has_none(): void
+    {
+        $config = $this->makeConfig();
+        $this->makeImporter($this->fakeFeedXml())->run($config);
+
+        $product = Product::query()->where('code', 'SKU-1')->first();
+        ProductParameter::query()->create([
+            'product_id' => $product->id,
+            'name' => 'Manual',
+            'value' => 'Yes',
+            'position' => 1,
+        ]);
+
+        $this->makeImporter($this->fakeFeedXml())->run($config);
+
+        $params = ProductParameter::query()->where('product_id', $product->id)->get();
+        $this->assertCount(1, $params);
+        $this->assertSame('Manual', $params[0]->name);
+    }
+
+    public function test_import_all_images_off_skips_gallery_sync(): void
+    {
+        $config = $this->makeConfig(['import_all_images' => false]);
+
+        $payload = <<<'XML'
+<?xml version="1.0" encoding="UTF-8"?>
+<SHOP>
+  <SHOPITEM>
+    <ITEM_ID>SKU-1</ITEM_ID>
+    <PRODUCTNAME>Demo</PRODUCTNAME>
+    <IMGURL>https://example.com/main.jpg</IMGURL>
+    <IMGURL>https://example.com/alt-1.jpg</IMGURL>
+    <IMGURL>https://example.com/alt-2.jpg</IMGURL>
+  </SHOPITEM>
+</SHOP>
+XML;
+
+        $this->makeImporter($payload)->run($config);
+
+        $product = Product::query()->where('code', 'SKU-1')->first();
+        // Primary image still lands on Product (it's not "the gallery").
+        $this->assertSame('https://example.com/main.jpg', $product->image_url);
+
+        // Gallery rows are NOT created when import_all_images is off.
+        $this->assertSame(0, ProductImage::query()->where('product_id', $product->id)->count());
+    }
+
+    public function test_import_short_description_off_drops_short_field(): void
+    {
+        $config = $this->makeConfig(['import_short_description' => false]);
+
+        $payload = <<<'XML'
+<?xml version="1.0" encoding="UTF-8"?>
+<SHOP>
+  <SHOPITEM>
+    <ITEM_ID>SKU-1</ITEM_ID>
+    <PRODUCTNAME>Demo</PRODUCTNAME>
+    <SHORT_DESCRIPTION>Krátký popis z feedu</SHORT_DESCRIPTION>
+    <DESCRIPTION>Dlouhý popis z feedu.</DESCRIPTION>
+  </SHOPITEM>
+</SHOP>
+XML;
+
+        $this->makeImporter($payload)->run($config);
+
+        $product = Product::query()->where('code', 'SKU-1')->first();
+        $this->assertNull($product->short_description);
+        $this->assertSame('Dlouhý popis z feedu.', $product->description);
+    }
+
+    public function test_import_long_description_off_drops_long_field(): void
+    {
+        $config = $this->makeConfig(['import_long_description' => false]);
+
+        $payload = <<<'XML'
+<?xml version="1.0" encoding="UTF-8"?>
+<SHOP>
+  <SHOPITEM>
+    <ITEM_ID>SKU-1</ITEM_ID>
+    <PRODUCTNAME>Demo</PRODUCTNAME>
+    <SHORT_DESCRIPTION>Krátký</SHORT_DESCRIPTION>
+    <DESCRIPTION>Dlouhý popis.</DESCRIPTION>
+  </SHOPITEM>
+</SHOP>
+XML;
+
+        $this->makeImporter($payload)->run($config);
+
+        $product = Product::query()->where('code', 'SKU-1')->first();
+        $this->assertSame('Krátký', $product->short_description);
+        $this->assertNull($product->description);
+    }
+
+    public function test_parameters_only_mode_only_syncs_parameters_for_existing_products(): void
+    {
+        $config = $this->makeConfig(['import_parameters_only' => true]);
+
+        // Pre-existing product with manual data we don't want to lose.
+        Product::query()->create([
+            'supplier_id' => $config->supplier_id,
+            'code' => 'SKU-1',
+            'name' => 'Original name',
+            'price_vat' => '999.0000',
+            'stock_quantity' => 10,
+            'short_description' => 'Original short',
+            'description' => 'Original long',
+            'image_url' => 'https://example.com/original.jpg',
+        ]);
+
+        $payload = <<<'XML'
+<?xml version="1.0" encoding="UTF-8"?>
+<SHOP>
+  <SHOPITEM>
+    <ITEM_ID>SKU-1</ITEM_ID>
+    <PRODUCTNAME>Different name from supplement feed</PRODUCTNAME>
+    <PRICE_VAT>500.0000</PRICE_VAT>
+    <SHORT_DESCRIPTION>Different short</SHORT_DESCRIPTION>
+    <DESCRIPTION>Different long</DESCRIPTION>
+    <IMGURL>https://example.com/different.jpg</IMGURL>
+    <PARAM><PARAM_NAME>Barva</PARAM_NAME><VAL>Modrá</VAL></PARAM>
+    <PARAM><PARAM_NAME>Velikost</PARAM_NAME><VAL>XL</VAL></PARAM>
+  </SHOPITEM>
+</SHOP>
+XML;
+
+        $log = $this->makeImporter($payload)->run($config);
+        $this->assertSame(1, $log->products_updated);
+
+        $product = Product::query()->where('code', 'SKU-1')->first();
+
+        // Original data must survive — parameters-only mode skips upsert.
+        $this->assertSame('Original name', $product->name);
+        $this->assertSame('999.0000', $product->price_vat);
+        $this->assertSame(10, $product->stock_quantity);
+        $this->assertSame('Original short', $product->short_description);
+        $this->assertSame('Original long', $product->description);
+        $this->assertSame('https://example.com/original.jpg', $product->image_url);
+
+        // Parameters were synced from the supplement feed.
+        $params = ProductParameter::query()
+            ->where('product_id', $product->id)
+            ->orderBy('position')
+            ->get();
+        $this->assertCount(2, $params);
+        $this->assertSame('Barva', $params[0]->name);
+        $this->assertSame('Modrá', $params[0]->value);
+        $this->assertSame('Velikost', $params[1]->name);
+        $this->assertSame('XL', $params[1]->value);
+    }
+
+    public function test_parameters_only_mode_skips_unknown_products(): void
+    {
+        $config = $this->makeConfig(['import_parameters_only' => true]);
+        // Catalogue is empty.
+
+        $payload = <<<'XML'
+<?xml version="1.0" encoding="UTF-8"?>
+<SHOP>
+  <SHOPITEM>
+    <ITEM_ID>UNKNOWN</ITEM_ID>
+    <PRODUCTNAME>Ghost</PRODUCTNAME>
+    <PARAM><PARAM_NAME>Foo</PARAM_NAME><VAL>Bar</VAL></PARAM>
+  </SHOPITEM>
+</SHOP>
+XML;
+
+        $log = $this->makeImporter($payload)->run($config);
+
+        $this->assertSame(1, $log->products_found);
+        $this->assertSame(0, $log->products_new);
+        $this->assertSame(0, $log->products_updated);
+        $this->assertSame(0, Product::query()->count());
+        $this->assertSame(0, ProductParameter::query()->count());
+    }
+
+    public function test_imports_short_description_when_present(): void
+    {
+        $config = $this->makeConfig();
+
+        $payload = <<<'XML'
+<?xml version="1.0" encoding="UTF-8"?>
+<SHOP>
+  <SHOPITEM>
+    <ITEM_ID>SKU-1</ITEM_ID>
+    <PRODUCTNAME>Demo</PRODUCTNAME>
+    <SHORT_DESCRIPTION>Stručný popis</SHORT_DESCRIPTION>
+    <DESCRIPTION>Detailní popis produktu.</DESCRIPTION>
+  </SHOPITEM>
+</SHOP>
+XML;
+
+        $this->makeImporter($payload)->run($config);
+
+        $product = Product::query()->where('code', 'SKU-1')->first();
+        $this->assertSame('Stručný popis', $product->short_description);
+        $this->assertSame('Detailní popis produktu.', $product->description);
+    }
+
+    public function test_gallery_is_left_alone_when_feed_has_no_extra_images(): void
+    {
+        $config = $this->makeConfig();
+
+        // Feed without extra <IMGURL> rows; just the primary one.
+        $payload = $this->fakeFeedXml();
+
+        $this->makeImporter($payload)->run($config);
+
+        // Manually add a gallery row (e.g. uploaded via admin).
+        $product = Product::query()->where('code', 'SKU-1')->first();
+        ProductImage::query()->create([
+            'product_id' => $product->id,
+            'url' => 'https://example.com/manual.jpg',
+            'position' => 1,
+        ]);
+
+        // Re-import: feed still has no extras, so manual upload should remain.
+        $this->makeImporter($payload)->run($config);
+
+        $gallery = ProductImage::query()->where('product_id', $product->id)->get();
+        $this->assertCount(1, $gallery);
+        $this->assertSame('https://example.com/manual.jpg', $gallery[0]->url);
+    }
+
     public function test_update_only_mode_skips_unknown_products(): void
     {
         $config = $this->makeConfig(['update_only_mode' => true]);
@@ -193,10 +626,8 @@ final class FeedImporterTest extends TestCase
         $this->assertSame(0, $log->products_new);
         $this->assertSame(1, $log->products_updated);
 
-        // SKU-2 was NOT created because update_only_mode is on.
         $this->assertNull(Product::query()->where('code', 'SKU-2')->first());
 
-        // Last message reflects the skipped count for transparency.
         $config->refresh();
         $this->assertStringContainsString('skipped 1', (string) $config->last_message);
     }

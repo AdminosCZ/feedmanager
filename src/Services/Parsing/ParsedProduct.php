@@ -14,11 +14,16 @@ namespace Adminos\Modules\Feedmanager\Services\Parsing;
  */
 final class ParsedProduct
 {
+    /**
+     * @param  array<int, string>  $gallery_urls  Additional images beyond the primary `image_url`. Populates {@see \Adminos\Modules\Feedmanager\Models\ProductImage}.
+     * @param  array<int, array{name: string, value: string}>  $parameters  Custom product parameters (e.g. color, size). Populates {@see \Adminos\Modules\Feedmanager\Models\ProductParameter}.
+     */
     public function __construct(
         public readonly string $code,
         public readonly string $name,
         public readonly ?string $ean = null,
         public readonly ?string $product_number = null,
+        public readonly ?string $short_description = null,
         public readonly ?string $description = null,
         public readonly ?string $manufacturer = null,
         public readonly ?float $price = null,
@@ -30,6 +35,8 @@ final class ParsedProduct
         public readonly ?string $image_url = null,
         public readonly ?string $category_text = null,
         public readonly ?string $complete_path = null,
+        public readonly array $gallery_urls = [],
+        public readonly array $parameters = [],
     ) {
     }
 
@@ -45,6 +52,7 @@ final class ParsedProduct
             'name' => $this->name,
             'ean' => $this->ean,
             'product_number' => $this->product_number,
+            'short_description' => $this->short_description,
             'description' => $this->description,
             'manufacturer' => $this->manufacturer,
             'price' => $this->price,

@@ -90,9 +90,9 @@ final class ShoptetFeedParser implements FeedParser
             name: $name,
             ean: $this->trimmed($this->childText($node, 'EAN')),
             product_number: $this->trimmed($this->childText($node, 'PRODUCTNO')),
-            description: $this->trimmed(
-                $this->childText($node, 'DESCRIPTION') ?? $this->childText($node, 'SHORT_DESCRIPTION'),
-            ),
+            short_description: $this->trimmed($this->childText($node, 'SHORT_DESCRIPTION')),
+            description: $this->trimmed($this->childText($node, 'DESCRIPTION'))
+                ?? $this->trimmed($this->childText($node, 'SHORT_DESCRIPTION')),
             manufacturer: $this->trimmed($this->childText($node, 'MANUFACTURER')),
             price: $this->floatOrNull($this->childText($node, 'PRICE')),
             price_vat: $this->floatOrNull($this->childText($node, 'PRICE_VAT')),
@@ -106,7 +106,79 @@ final class ShoptetFeedParser implements FeedParser
             image_url: $this->firstImage($node),
             category_text: $this->lastSegment($this->childText($node, 'CATEGORYTEXT')),
             complete_path: $this->trimmed($this->childText($node, 'CATEGORYTEXT')),
+            gallery_urls: $this->collectAdditionalImages($node),
+            parameters: $this->collectParameters($node),
         );
+    }
+
+    /**
+     * Shoptet supplier-export uses the same `<PARAM><PARAM_NAME>X</PARAM_NAME><VAL>Y</VAL></PARAM>`
+     * shape as Heuréka and Zboží.cz.
+     *
+     * @return array<int, array{name: string, value: string}>
+     */
+    private function collectParameters(\DOMElement $parent): array
+    {
+        $params = [];
+
+        foreach ($parent->childNodes as $child) {
+            if (! $child instanceof \DOMElement) {
+                continue;
+            }
+            if ($child->localName !== 'PARAM') {
+                continue;
+            }
+
+            $name = null;
+            $value = null;
+            foreach ($child->childNodes as $sub) {
+                if (! $sub instanceof \DOMElement) {
+                    continue;
+                }
+                if ($sub->localName === 'PARAM_NAME') {
+                    $name = trim($sub->textContent);
+                } elseif ($sub->localName === 'VAL') {
+                    $value = trim($sub->textContent);
+                }
+            }
+
+            if ($name !== null && $name !== '' && $value !== null && $value !== '') {
+                $params[] = ['name' => $name, 'value' => $value];
+            }
+        }
+
+        return $params;
+    }
+
+    /**
+     * Shoptet exports may emit multiple `<IMGURL>` per item — first is primary
+     * (already in image_url), rest go into the gallery.
+     *
+     * @return array<int, string>
+     */
+    private function collectAdditionalImages(\DOMElement $parent): array
+    {
+        $urls = [];
+        $skippedFirst = false;
+
+        foreach ($parent->childNodes as $child) {
+            if (! $child instanceof \DOMElement) {
+                continue;
+            }
+            if ($child->localName !== 'IMGURL') {
+                continue;
+            }
+            if (! $skippedFirst) {
+                $skippedFirst = true;
+                continue;
+            }
+            $value = $this->trimmed($child->textContent);
+            if ($value !== null) {
+                $urls[] = $value;
+            }
+        }
+
+        return $urls;
     }
 
     private function childText(\DOMElement $parent, string $childName): ?string

@@ -97,11 +97,15 @@ final class GoogleShoppingFeedParser implements FeedParser
         $priceField = $this->parsePrice($this->gChild($node, 'price'));
         $oldPriceField = $this->parsePrice($this->gChild($node, 'sale_price'));
 
+        $primaryImage = $this->trimmed($this->gChild($node, 'image_link'));
+        $galleryUrls = $this->collectAdditionalImages($node);
+
         return new ParsedProduct(
             code: $code,
             name: $name,
             ean: $this->trimmed($this->gChild($node, 'gtin')),
             product_number: $this->trimmed($this->gChild($node, 'mpn')),
+            short_description: null,
             description: $this->trimmed($this->gChild($node, 'description')),
             manufacturer: $this->trimmed($this->gChild($node, 'brand')),
             price: null,
@@ -110,10 +114,80 @@ final class GoogleShoppingFeedParser implements FeedParser
             currency: $priceField['currency'] ?? 'CZK',
             stock_quantity: null,
             availability: $this->mapAvailability($this->trimmed($this->gChild($node, 'availability'))),
-            image_url: $this->trimmed($this->gChild($node, 'image_link')),
+            image_url: $primaryImage,
             category_text: $this->lastSegment($this->gChild($node, 'product_type')),
             complete_path: $this->trimmed($this->gChild($node, 'product_type')),
+            gallery_urls: $galleryUrls,
+            parameters: $this->collectParameters($node),
         );
+    }
+
+    /**
+     * Google Shopping parameters live inside `<g:product_detail>` blocks:
+     *   <g:product_detail>
+     *     <g:attribute_name>Color</g:attribute_name>
+     *     <g:attribute_value>Red</g:attribute_value>
+     *   </g:product_detail>
+     *
+     * @return array<int, array{name: string, value: string}>
+     */
+    private function collectParameters(\DOMElement $parent): array
+    {
+        $params = [];
+
+        foreach ($parent->childNodes as $child) {
+            if (! $child instanceof \DOMElement) {
+                continue;
+            }
+            if ($child->localName !== 'product_detail') {
+                continue;
+            }
+
+            $name = null;
+            $value = null;
+            foreach ($child->childNodes as $sub) {
+                if (! $sub instanceof \DOMElement) {
+                    continue;
+                }
+                if ($sub->localName === 'attribute_name') {
+                    $name = trim($sub->textContent);
+                } elseif ($sub->localName === 'attribute_value') {
+                    $value = trim($sub->textContent);
+                }
+            }
+
+            if ($name !== null && $name !== '' && $value !== null && $value !== '') {
+                $params[] = ['name' => $name, 'value' => $value];
+            }
+        }
+
+        return $params;
+    }
+
+    /**
+     * Google Shopping uses one `<g:image_link>` plus zero or more
+     * `<g:additional_image_link>`. Collect the additional ones for the gallery
+     * relation. The primary image is intentionally not duplicated here.
+     *
+     * @return array<int, string>
+     */
+    private function collectAdditionalImages(\DOMElement $parent): array
+    {
+        $urls = [];
+
+        foreach ($parent->childNodes as $child) {
+            if (! $child instanceof \DOMElement) {
+                continue;
+            }
+            if ($child->localName === 'additional_image_link') {
+                $value = $this->trimmed($child->textContent);
+                if ($value !== null) {
+                    $urls[] = $value;
+                }
+            }
+        }
+
+        return $urls;
     }
 
     private function gChild(\DOMElement $parent, string $localName): ?string

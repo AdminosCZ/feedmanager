@@ -99,6 +99,7 @@ final class ZboziFeedParser implements FeedParser
             name: $name,
             ean: $this->trimmed($this->childText($node, 'EAN')),
             product_number: $this->trimmed($this->childText($node, 'PRODUCTNO')),
+            short_description: $this->trimmed($this->childText($node, 'SHORT_DESCRIPTION')),
             description: $this->trimmed($this->childText($node, 'DESCRIPTION')),
             manufacturer: $this->trimmed($this->childText($node, 'MANUFACTURER')),
             price: $this->floatOrNull($this->childText($node, 'PRICE')),
@@ -114,7 +115,77 @@ final class ZboziFeedParser implements FeedParser
             image_url: $this->trimmed($this->childText($node, 'IMGURL')),
             category_text: $this->lastCategorySegment($node),
             complete_path: $this->trimmed($this->childText($node, 'CATEGORYTEXT')),
+            gallery_urls: $this->collectAlternativeImages($node),
+            parameters: $this->collectParameters($node),
         );
+    }
+
+    /**
+     * Zboží.cz / Heuréka shape:
+     *   <PARAM>
+     *     <PARAM_NAME>Color</PARAM_NAME>
+     *     <VAL>Red</VAL>
+     *   </PARAM>
+     *
+     * @return array<int, array{name: string, value: string}>
+     */
+    private function collectParameters(\DOMElement $parent): array
+    {
+        $params = [];
+
+        foreach ($parent->childNodes as $child) {
+            if (! $child instanceof \DOMElement) {
+                continue;
+            }
+            if ($child->localName !== 'PARAM') {
+                continue;
+            }
+
+            $name = null;
+            $value = null;
+            foreach ($child->childNodes as $sub) {
+                if (! $sub instanceof \DOMElement) {
+                    continue;
+                }
+                if ($sub->localName === 'PARAM_NAME') {
+                    $name = trim($sub->textContent);
+                } elseif ($sub->localName === 'VAL') {
+                    $value = trim($sub->textContent);
+                }
+            }
+
+            if ($name !== null && $name !== '' && $value !== null && $value !== '') {
+                $params[] = ['name' => $name, 'value' => $value];
+            }
+        }
+
+        return $params;
+    }
+
+    /**
+     * Zboží.cz / Shoptet seznam feed has one `<IMGURL>` (primary, already used
+     * as image_url) plus zero or more `<IMGURL_ALTERNATIVE>`. Collect the
+     * alternatives for the gallery relation.
+     *
+     * @return array<int, string>
+     */
+    private function collectAlternativeImages(\DOMElement $parent): array
+    {
+        $urls = [];
+
+        foreach ($parent->childNodes as $child) {
+            if (! $child instanceof \DOMElement) {
+                continue;
+            }
+            if ($child->localName === 'IMGURL_ALTERNATIVE') {
+                $value = $this->trimmed($child->textContent);
+                if ($value !== null) {
+                    $urls[] = $value;
+                }
+            }
+        }
+
+        return $urls;
     }
 
     private function childText(\DOMElement $parent, string $childName): ?string

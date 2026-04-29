@@ -94,6 +94,28 @@ final class FeedConfigForm
                         ->default(false)
                         ->helperText(__('feedmanager::feedmanager.helpers.update_only_mode')),
                 ]),
+
+            Section::make(__('feedmanager::feedmanager.feed_configs.sections.import_scope'))
+                ->description(__('feedmanager::feedmanager.helpers.import_scope_section'))
+                ->columns(3)
+                ->components([
+                    Toggle::make('import_all_images')
+                        ->label(__('feedmanager::feedmanager.fields.import_all_images'))
+                        ->default(true)
+                        ->helperText(__('feedmanager::feedmanager.helpers.import_all_images')),
+                    Toggle::make('import_short_description')
+                        ->label(__('feedmanager::feedmanager.fields.import_short_description'))
+                        ->default(true)
+                        ->helperText(__('feedmanager::feedmanager.helpers.import_short_description')),
+                    Toggle::make('import_long_description')
+                        ->label(__('feedmanager::feedmanager.fields.import_long_description'))
+                        ->default(true)
+                        ->helperText(__('feedmanager::feedmanager.helpers.import_long_description')),
+                    Toggle::make('import_parameters_only')
+                        ->label(__('feedmanager::feedmanager.fields.import_parameters_only'))
+                        ->default(false)
+                        ->helperText(__('feedmanager::feedmanager.helpers.import_parameters_only')),
+                ]),
         ]);
     }
 

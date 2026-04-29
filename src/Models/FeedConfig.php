@@ -63,6 +63,10 @@ final class FeedConfig extends Model
         'auto_update' => false,
         'default_b2b_allowed' => true,
         'update_only_mode' => false,
+        'import_all_images' => true,
+        'import_short_description' => true,
+        'import_long_description' => true,
+        'import_parameters_only' => false,
     ];
 
     protected $casts = [
@@ -70,6 +74,10 @@ final class FeedConfig extends Model
         'auto_update' => 'boolean',
         'default_b2b_allowed' => 'boolean',
         'update_only_mode' => 'boolean',
+        'import_all_images' => 'boolean',
+        'import_short_description' => 'boolean',
+        'import_long_description' => 'boolean',
+        'import_parameters_only' => 'boolean',
         'last_run_at' => 'datetime',
         // Laravel's `encrypted` cast uses APP_KEY for AES-256-CBC + HMAC.
         // Encrypted values are larger than plaintext — make sure the column

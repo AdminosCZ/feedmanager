@@ -33,7 +33,8 @@ final class CustomFeedParser implements FeedParser
         'name' => ['PRODUCT', 'PRODUCTNAME', 'NAME', 'name', 'title', 'TITLE'],
         'ean' => ['EAN', 'gtin', 'GTIN', 'barcode', 'BARCODE'],
         'product_number' => ['PRODUCTNO', 'mpn', 'MPN'],
-        'description' => ['DESCRIPTION', 'description', 'SHORT_DESCRIPTION', 'desc'],
+        'short_description' => ['SHORT_DESCRIPTION', 'short_description', 'short_desc', 'subtitle'],
+        'description' => ['DESCRIPTION', 'description', 'desc'],
         'manufacturer' => ['MANUFACTURER', 'BRAND', 'brand'],
         'price' => ['PRICE', 'price'],
         'price_vat' => ['PRICE_VAT', 'price_vat'],
@@ -124,6 +125,7 @@ final class CustomFeedParser implements FeedParser
             name: $name,
             ean: $this->resolveField($node, self::FIELD_ALIASES['ean']),
             product_number: $this->resolveField($node, self::FIELD_ALIASES['product_number']),
+            short_description: $this->resolveField($node, self::FIELD_ALIASES['short_description']),
             description: $this->resolveField($node, self::FIELD_ALIASES['description']),
             manufacturer: $this->resolveField($node, self::FIELD_ALIASES['manufacturer']),
             price: $this->floatOrNull($this->resolveField($node, self::FIELD_ALIASES['price'])),
@@ -135,7 +137,102 @@ final class CustomFeedParser implements FeedParser
             image_url: $this->resolveField($node, self::FIELD_ALIASES['image_url']),
             category_text: $this->lastSegment($categoryText),
             complete_path: $categoryText,
+            gallery_urls: $this->collectGalleryImages($node),
+            parameters: $this->collectParameters($node),
         );
+    }
+
+    /**
+     * Heuristic parameter extraction — covers `<PARAM><PARAM_NAME>X</PARAM_NAME><VAL>Y</VAL></PARAM>`
+     * (Heuréka / Zboží / Shoptet supplier export) and the Google
+     * `<g:product_detail>` / `<product_detail>` shape.
+     *
+     * @return array<int, array{name: string, value: string}>
+     */
+    private function collectParameters(\DOMElement $parent): array
+    {
+        $params = [];
+
+        foreach ($parent->childNodes as $child) {
+            if (! $child instanceof \DOMElement) {
+                continue;
+            }
+            $kind = $child->nodeName;
+
+            if ($kind === 'PARAM') {
+                $name = $this->paramChildText($child, ['PARAM_NAME']);
+                $value = $this->paramChildText($child, ['VAL', 'VALUE']);
+            } elseif ($kind === 'product_detail' || $kind === 'g:product_detail') {
+                $name = $this->paramChildText($child, ['attribute_name']);
+                $value = $this->paramChildText($child, ['attribute_value']);
+            } else {
+                continue;
+            }
+
+            if ($name !== null && $name !== '' && $value !== null && $value !== '') {
+                $params[] = ['name' => $name, 'value' => $value];
+            }
+        }
+
+        return $params;
+    }
+
+    /**
+     * @param  array<int, string>  $names
+     */
+    private function paramChildText(\DOMElement $parent, array $names): ?string
+    {
+        foreach ($parent->childNodes as $child) {
+            if (! $child instanceof \DOMElement) {
+                continue;
+            }
+            if (in_array($child->nodeName, $names, true)) {
+                $value = trim($child->textContent);
+                return $value === '' ? null : $value;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Heuristic gallery extraction — same logic as HeurekaFeedParser. First
+     * <IMGURL>/<image> is primary; collect siblings + <IMGURL_ALTERNATIVE>.
+     *
+     * @return array<int, string>
+     */
+    private function collectGalleryImages(\DOMElement $parent): array
+    {
+        $urls = [];
+        $skippedFirst = false;
+        $primaryAliases = self::FIELD_ALIASES['image_url'];
+
+        foreach ($parent->childNodes as $child) {
+            if (! $child instanceof \DOMElement) {
+                continue;
+            }
+            $name = $child->nodeName;
+
+            if (in_array($name, $primaryAliases, true)) {
+                if (! $skippedFirst) {
+                    $skippedFirst = true;
+                    continue;
+                }
+                $value = trim($child->textContent);
+                if ($value !== '') {
+                    $urls[] = $value;
+                }
+                continue;
+            }
+
+            if ($name === 'IMGURL_ALTERNATIVE' || $name === 'additional_image_link') {
+                $value = trim($child->textContent);
+                if ($value !== '') {
+                    $urls[] = $value;
+                }
+            }
+        }
+
+        return $urls;
     }
 
     /**
