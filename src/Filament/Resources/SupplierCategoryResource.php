@@ -55,6 +55,19 @@ final class SupplierCategoryResource extends Resource
         return __('feedmanager::feedmanager.navigation.group');
     }
 
+    /**
+     * Mapping is for the supplier→shop translation only. Own-eshop products
+     * carry the shop tree paths natively, so we hide their (rare, mostly
+     * legacy) supplier_categories rows from this resource entirely.
+     */
+    public static function getEloquentQuery(): \Illuminate\Database\Eloquent\Builder
+    {
+        return parent::getEloquentQuery()->whereHas(
+            'supplier',
+            fn ($q) => $q->where('is_own', false),
+        );
+    }
+
     public static function form(Schema $schema): Schema
     {
         // Only the mapping is editable inline; the supplier_category itself
@@ -98,7 +111,7 @@ final class SupplierCategoryResource extends Resource
             ->filters([
                 SelectFilter::make('supplier_id')
                     ->label(__('feedmanager::feedmanager.fields.supplier'))
-                    ->relationship('supplier', 'name'),
+                    ->relationship('supplier', 'name', fn ($q) => $q->where('is_own', false)),
                 TernaryFilter::make('has_mapping')
                     ->label(__('feedmanager::feedmanager.supplier_categories.filter_has_mapping'))
                     ->placeholder(__('feedmanager::feedmanager.supplier_categories.filter_all'))
@@ -163,7 +176,7 @@ final class SupplierCategoryResource extends Resource
                     ->schema([
                         Select::make('supplier_id')
                             ->label(__('feedmanager::feedmanager.fields.supplier'))
-                            ->relationship('supplier', 'name')
+                            ->relationship('supplier', 'name', fn ($q) => $q->where('is_own', false))
                             ->required(),
                     ])
                     ->action(function (array $data, CategoryMappingService $service): void {

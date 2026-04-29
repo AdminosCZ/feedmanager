@@ -92,11 +92,18 @@ class FeedImporter
                 }
             }
 
-            // Re-derive supplier categories from imported products and push
-            // any pre-existing mappings down to product.shoptet_category_id.
+            // External suppliers: re-derive supplier_categories from imported
+            // products and push pre-existing mappings down. Own eshop:
+            // products carry the live shop tree paths, so we resolve
+            // shoptet_category_id directly via path match — no
+            // supplier_categories indirection needed.
             if ($config->supplier !== null) {
-                $this->categoryMappings->syncFromProducts($config->supplier, $config->id);
-                $this->categoryMappings->propagateMappings($config->supplier);
+                if ($config->supplier->is_own === true) {
+                    $this->categoryMappings->linkOwnEshopProducts($config->supplier, $config->id);
+                } else {
+                    $this->categoryMappings->syncFromProducts($config->supplier, $config->id);
+                    $this->categoryMappings->propagateMappings($config->supplier);
+                }
             }
 
             $status = ImportLog::STATUS_SUCCESS;

@@ -126,9 +126,9 @@ return [
         ],
     ],
     'shoptet_categories' => [
-        'label' => 'Cieľová kategória (eshop)',
-        'plural_label' => 'Cieľové kategórie (eshop)',
-        'navigation_label' => 'Kategórie eshopu',
+        'label' => 'Kategórie e-shopu',
+        'plural_label' => 'Kategórie e-shopu',
+        'navigation_label' => 'Kategórie e-shopu',
         'orphan_state' => [
             'present' => 'Aktívna',
             'orphaned' => 'Osirelá',

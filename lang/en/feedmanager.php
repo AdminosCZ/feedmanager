@@ -126,8 +126,8 @@ return [
         ],
     ],
     'shoptet_categories' => [
-        'label' => 'Target category (shop)',
-        'plural_label' => 'Target categories (shop)',
+        'label' => 'Shop category',
+        'plural_label' => 'Shop categories',
         'navigation_label' => 'Shop categories',
         'orphan_state' => [
             'present' => 'Active',

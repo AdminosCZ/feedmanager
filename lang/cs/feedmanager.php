@@ -126,9 +126,9 @@ return [
         ],
     ],
     'shoptet_categories' => [
-        'label' => 'Cílová kategorie (eshop)',
-        'plural_label' => 'Cílové kategorie (eshop)',
-        'navigation_label' => 'Kategorie eshopu',
+        'label' => 'Kategorie e-shopu',
+        'plural_label' => 'Kategorie e-shopu',
+        'navigation_label' => 'Kategorie e-shopu',
         'orphan_state' => [
             'present' => 'Aktivní',
             'orphaned' => 'Osiřelá',

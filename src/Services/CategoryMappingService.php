@@ -13,12 +13,22 @@ use Adminos\Modules\Feedmanager\Models\SupplierCategory;
 /**
  * Builds and maintains the supplier-category ↔ shoptet-category linkage.
  *
+ * Mapping is meaningful only for **external suppliers** — they ship products
+ * with their own category names that need translation onto the client's
+ * shop category tree. Own-eshop products (`Supplier::is_own = true`) come
+ * with categories that *are* the shop tree, so {@see linkOwnEshopProducts()}
+ * resolves them by direct path match instead of going through
+ * supplier_categories at all.
+ *
  * - {@see syncFromProducts()} re-derives `supplier_categories` from product
  *   `complete_path`/`category_text`, refreshes `product_count`, and links
- *   each product to its `supplier_category_id`.
+ *   each product to its `supplier_category_id`. **No-op for own-eshop.**
  * - {@see propagateMappings()} pushes the active `category_mappings` rows
  *   onto product `shoptet_category_id` so the exporter can resolve the
  *   target category in a single column read.
+ * - {@see linkOwnEshopProducts()} matches each own-eshop product's
+ *   `complete_path` against `shoptet_categories.full_path` and writes the
+ *   resolved id directly to `product.shoptet_category_id`.
  * - {@see autoMap()} fuzzy-matches unmapped supplier categories against
  *   shoptet categories using PHP's `similar_text` percent score.
  *
@@ -39,6 +49,13 @@ final class CategoryMappingService
      */
     public function syncFromProducts(Supplier $supplier, ?int $feedConfigId = null): void
     {
+        if ($supplier->is_own === true) {
+            // Own-eshop categories aren't a translation target — they're
+            // already the shop tree. Skip and let linkOwnEshopProducts()
+            // handle the direct path match.
+            return;
+        }
+
         $rows = Product::query()
             ->where('supplier_id', $supplier->id)
             ->when($feedConfigId !== null, fn ($q) => $q->where('feed_config_id', $feedConfigId))
@@ -80,11 +97,58 @@ final class CategoryMappingService
     }
 
     /**
+     * Match each own-eshop product's `complete_path` against the live shop
+     * category tree (`shoptet_categories.full_path`) and write the resolved
+     * id directly onto the product. No supplier_categories indirection.
+     *
+     * Path normalisation tolerates Shoptet's `|` separator (custom XML's
+     * `#COMPLETE_PATH_PIPE#`) vs the sync service's canonical `>`.
+     */
+    public function linkOwnEshopProducts(Supplier $supplier, ?int $feedConfigId = null): void
+    {
+        if ($supplier->is_own !== true) {
+            return;
+        }
+
+        $pathMap = ShoptetCategory::query()
+            ->whereNotNull('full_path')
+            ->get(['id', 'full_path'])
+            ->mapWithKeys(fn (ShoptetCategory $c): array => [
+                $this->normalizePath((string) $c->full_path) => $c->id,
+            ])
+            ->all();
+
+        if ($pathMap === []) {
+            return;
+        }
+
+        Product::query()
+            ->where('supplier_id', $supplier->id)
+            ->when($feedConfigId !== null, fn ($q) => $q->where('feed_config_id', $feedConfigId))
+            ->whereNotNull('complete_path')
+            ->chunkById(500, function ($products) use ($pathMap): void {
+                foreach ($products as $product) {
+                    $key = $this->normalizePath((string) $product->complete_path);
+                    $matchId = $pathMap[$key] ?? null;
+
+                    if ($product->shoptet_category_id !== $matchId) {
+                        $product->forceFill(['shoptet_category_id' => $matchId])->save();
+                    }
+                }
+            });
+    }
+
+    /**
      * After a mapping is created/updated/deleted, push the change down to
-     * every product that lives in that supplier category.
+     * every product that lives in that supplier category. No-op for
+     * own-eshop suppliers — their products are linked via direct path.
      */
     public function propagateMappings(Supplier $supplier): void
     {
+        if ($supplier->is_own === true) {
+            return;
+        }
+
         $supplierCategories = SupplierCategory::query()
             ->where('supplier_id', $supplier->id)
             ->with('mapping')
@@ -163,6 +227,22 @@ final class CategoryMappingService
     {
         $segments = preg_split('/\s*[|>\/]\s*/', $path) ?: [];
         $segments = array_values(array_filter($segments, fn (string $s): bool => $s !== ''));
+
         return $segments === [] ? $path : (string) end($segments);
+    }
+
+    /**
+     * Normalise a category path to a canonical form (`A > B > C`) so paths
+     * that differ only in separator (Shoptet `|` vs sync service `>`) match.
+     */
+    private function normalizePath(string $path): string
+    {
+        $segments = preg_split('/\s*[|>]\s*/', $path) ?: [];
+        $segments = array_values(array_filter(
+            array_map('trim', $segments),
+            fn (string $s): bool => $s !== '',
+        ));
+
+        return implode(' > ', $segments);
     }
 }
