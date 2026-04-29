@@ -10,7 +10,6 @@ use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ViewColumn;
-use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 
@@ -19,9 +18,7 @@ final class SuppliersTable
     public static function configure(Table $table): Table
     {
         return $table
-            // Own eshops appear at the top of the list, then suppliers
-            // alphabetically — admin's own catalogue is the most-touched row.
-            ->defaultSort('is_own', 'desc')
+            ->defaultSort('name')
             ->columns([
                 ViewColumn::make('identity')
                     ->label(__('feedmanager::feedmanager.fields.supplier_name'))
@@ -66,12 +63,6 @@ final class SuppliersTable
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                SelectFilter::make('is_own')
-                    ->label(__('feedmanager::feedmanager.fields.supplier_kind'))
-                    ->options([
-                        '1' => __('feedmanager::feedmanager.suppliers.kind.own'),
-                        '0' => __('feedmanager::feedmanager.suppliers.kind.external'),
-                    ]),
                 TernaryFilter::make('is_active')
                     ->label(__('feedmanager::feedmanager.fields.is_active')),
             ])

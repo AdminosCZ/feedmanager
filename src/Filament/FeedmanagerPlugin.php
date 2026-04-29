@@ -8,6 +8,7 @@ use Adminos\Modules\Feedmanager\Filament\Pages\FeedExplorerPage;
 use Adminos\Modules\Feedmanager\Filament\Resources\ExportConfigResource;
 use Adminos\Modules\Feedmanager\Filament\Resources\FeedConfigResource;
 use Adminos\Modules\Feedmanager\Filament\Resources\FeedRuleResource;
+use Adminos\Modules\Feedmanager\Filament\Resources\OwnEshopResource;
 use Adminos\Modules\Feedmanager\Filament\Resources\ProductResource;
 use Adminos\Modules\Feedmanager\Filament\Resources\ShoptetCategoryResource;
 use Adminos\Modules\Feedmanager\Filament\Resources\SupplierCategoryResource;
@@ -30,6 +31,7 @@ final class FeedmanagerPlugin implements Plugin
     {
         $panel->resources([
             ProductResource::class,
+            OwnEshopResource::class,
             SupplierResource::class,
             FeedConfigResource::class,
             FeedRuleResource::class,

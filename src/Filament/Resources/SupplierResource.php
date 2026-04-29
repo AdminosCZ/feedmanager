@@ -68,21 +68,23 @@ final class SupplierResource extends Resource
     }
 
     /**
-     * Aggregated counts surfaced on the Dodavatelé list — schválené /
-     * ke kontrole / celkem produktů + počet doplňkových (parameters /
-     * stock-supplement) feedů.
+     * Sekce Dodavatelé je výhradně pro **externí** zdroje (re-prodávané
+     * katalogy). Vlastní eshopy mají vlastní sekci „Můj e-shop". Plus
+     * agregované counts pro tabulku.
      */
     public static function getEloquentQuery(): Builder
     {
-        return parent::getEloquentQuery()->withCount([
-            'products as approved_products_count' => fn (Builder $q) => $q->where('status', Product::STATUS_APPROVED),
-            'products as pending_products_count' => fn (Builder $q) => $q->where('status', Product::STATUS_PENDING),
-            'products as total_products_count',
-            'feedConfigs as supplemental_feeds_count' => fn (Builder $q) => $q->where(
-                fn (Builder $q2) => $q2->where('import_parameters_only', true)
-                    ->orWhere('update_only_mode', true),
-            ),
-        ]);
+        return parent::getEloquentQuery()
+            ->where('is_own', false)
+            ->withCount([
+                'products as approved_products_count' => fn (Builder $q) => $q->where('status', Product::STATUS_APPROVED),
+                'products as pending_products_count' => fn (Builder $q) => $q->where('status', Product::STATUS_PENDING),
+                'products as total_products_count',
+                'feedConfigs as supplemental_feeds_count' => fn (Builder $q) => $q->where(
+                    fn (Builder $q2) => $q2->where('import_parameters_only', true)
+                        ->orWhere('update_only_mode', true),
+                ),
+            ]);
     }
 
     public static function getPages(): array

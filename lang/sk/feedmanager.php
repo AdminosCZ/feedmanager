@@ -103,6 +103,11 @@ return [
         'no_credentials' => '— nenastavené —',
         'recent_downloads' => 'Posledné stiahnutia',
     ],
+    'own_eshops' => [
+        'label' => 'Môj e-shop',
+        'plural_label' => 'Moje e-shopy',
+        'navigation_label' => 'Môj e-shop',
+    ],
     'suppliers' => [
         'label' => 'Dodávateľ',
         'plural_label' => 'Dodávatelia',

@@ -11,11 +11,13 @@ use Adminos\Modules\Feedmanager\Models\Product;
 use Adminos\Modules\Feedmanager\Models\SupplierCategory;
 use Filament\Widgets\StatsOverviewWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
+use Illuminate\Database\Eloquent\Builder;
 
 /**
- * Six-card overview that sits on top of the Dodavatelé list (Napojse-style).
- * Each stat is a click-through to the relevant filtered surface so the admin
- * can drill down without context-switching through the menu.
+ * Six-card overview that sits on top of the Dodavatelé list. Stats are scoped
+ * to **external** suppliers only (`is_own=false`) — vlastní eshop má vlastní
+ * sekci s vlastním widgetem. Each stat is a click-through to the relevant
+ * filtered surface.
  */
 class SuppliersStatsOverview extends StatsOverviewWidget
 {
@@ -31,7 +33,8 @@ class SuppliersStatsOverview extends StatsOverviewWidget
         return [
             Stat::make(
                 __('feedmanager::feedmanager.suppliers_overview.approved_products'),
-                (string) Product::query()->where('status', Product::STATUS_APPROVED)->count(),
+                (string) self::externalProducts()
+                    ->where('status', Product::STATUS_APPROVED)->count(),
             )
                 ->descriptionIcon('heroicon-m-check-badge')
                 ->color('success')
@@ -39,7 +42,7 @@ class SuppliersStatsOverview extends StatsOverviewWidget
 
             Stat::make(
                 __('feedmanager::feedmanager.suppliers_overview.new_products'),
-                (string) Product::query()
+                (string) self::externalProducts()
                     ->where('imported_at', '>=', now()->subDays(7))
                     ->count(),
             )
@@ -50,7 +53,8 @@ class SuppliersStatsOverview extends StatsOverviewWidget
 
             Stat::make(
                 __('feedmanager::feedmanager.suppliers_overview.pending_products'),
-                (string) Product::query()->where('status', Product::STATUS_PENDING)->count(),
+                (string) self::externalProducts()
+                    ->where('status', Product::STATUS_PENDING)->count(),
             )
                 ->descriptionIcon('heroicon-m-magnifying-glass')
                 ->color('warning')
@@ -58,7 +62,7 @@ class SuppliersStatsOverview extends StatsOverviewWidget
 
             Stat::make(
                 __('feedmanager::feedmanager.suppliers_overview.total_products'),
-                (string) Product::query()->count(),
+                (string) self::externalProducts()->count(),
             )
                 ->descriptionIcon('heroicon-m-cube')
                 ->color('gray')
@@ -66,33 +70,37 @@ class SuppliersStatsOverview extends StatsOverviewWidget
 
             Stat::make(
                 __('feedmanager::feedmanager.suppliers_overview.unmapped_categories'),
-                (string) SupplierCategory::query()
-                    ->whereDoesntHave('mapping')
-                    ->whereHas('supplier', fn ($q) => $q->where('is_own', false))
-                    ->count(),
+                (string) self::unmappedCount(),
             )
                 ->descriptionIcon('heroicon-m-rectangle-group')
-                ->color(self::unmappedColor())
+                ->color(self::unmappedCount() > 0 ? 'warning' : 'success')
                 ->url(SupplierCategoryResource::getUrl('index', ['tableFilters[has_mapping][value]' => '0'])),
 
             self::lastSyncStat(),
         ];
     }
 
-    private static function unmappedColor(): string
+    private static function externalProducts(): Builder
     {
-        $count = SupplierCategory::query()
-            ->whereDoesntHave('mapping')
-            ->whereHas('supplier', fn ($q) => $q->where('is_own', false))
-            ->count();
+        return Product::query()->whereHas('supplier', fn (Builder $q) => $q->where('is_own', false));
+    }
 
-        return $count > 0 ? 'warning' : 'success';
+    private static function unmappedCount(): int
+    {
+        return SupplierCategory::query()
+            ->whereDoesntHave('mapping')
+            ->whereHas('supplier', fn (Builder $q) => $q->where('is_own', false))
+            ->count();
     }
 
     private static function lastSyncStat(): Stat
     {
         $log = ImportLog::query()
             ->where('status', ImportLog::STATUS_SUCCESS)
+            ->whereHas(
+                'feedConfig.supplier',
+                fn (Builder $q) => $q->where('is_own', false),
+            )
             ->latest('finished_at')
             ->first();
 

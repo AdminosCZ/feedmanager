@@ -29,6 +29,18 @@ final class FeedConfigResource extends Resource
 
     protected static ?int $navigationSort = 60;
 
+    /**
+     * Feedy patří pod konkrétního dodavatele/eshop — admin se k nim
+     * dostane přes detail (seznam feedů + sync action). Sekce „Vstupní
+     * feedy" jako samostatný top-level item v navigaci jenom mate.
+     * Resource zůstává registrovaný (kvůli URL pro Edit/Create akce
+     * volané z jiných ploch), jen ho schováme z navigace.
+     */
+    public static function shouldRegisterNavigation(): bool
+    {
+        return false;
+    }
+
     public static function getModelLabel(): string
     {
         return __('feedmanager::feedmanager.feed_configs.label');

@@ -103,6 +103,11 @@ return [
         'no_credentials' => '— not set —',
         'recent_downloads' => 'Recent downloads',
     ],
+    'own_eshops' => [
+        'label' => 'My e-shop',
+        'plural_label' => 'My e-shops',
+        'navigation_label' => 'My e-shop',
+    ],
     'suppliers' => [
         'label' => 'Supplier',
         'plural_label' => 'Suppliers',
