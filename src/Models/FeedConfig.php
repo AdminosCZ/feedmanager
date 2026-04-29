@@ -34,6 +34,8 @@ final class FeedConfig extends Model
 
     public const FORMAT_ZBOZI = 'zbozi';
 
+    public const FORMAT_SHOPTET_STOCK_CSV = 'shoptet_stock_csv';
+
     public const FORMAT_CUSTOM = 'custom';
 
     /** @var array<int, string> */
@@ -42,6 +44,7 @@ final class FeedConfig extends Model
         self::FORMAT_GOOGLE,
         self::FORMAT_SHOPTET,
         self::FORMAT_ZBOZI,
+        self::FORMAT_SHOPTET_STOCK_CSV,
         self::FORMAT_CUSTOM,
     ];
 
@@ -59,12 +62,14 @@ final class FeedConfig extends Model
         'is_active' => true,
         'auto_update' => false,
         'default_b2b_allowed' => true,
+        'update_only_mode' => false,
     ];
 
     protected $casts = [
         'is_active' => 'boolean',
         'auto_update' => 'boolean',
         'default_b2b_allowed' => 'boolean',
+        'update_only_mode' => 'boolean',
         'last_run_at' => 'datetime',
         // Laravel's `encrypted` cast uses APP_KEY for AES-256-CBC + HMAC.
         // Encrypted values are larger than plaintext — make sure the column

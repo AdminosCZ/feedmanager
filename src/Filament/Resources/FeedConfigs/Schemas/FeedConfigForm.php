@@ -75,7 +75,7 @@ final class FeedConfigForm
                 ]),
 
             Section::make(__('feedmanager::feedmanager.feed_configs.sections.scheduling'))
-                ->columns(3)
+                ->columns(2)
                 ->components([
                     Toggle::make('is_active')
                         ->label(__('feedmanager::feedmanager.fields.is_active'))
@@ -89,6 +89,10 @@ final class FeedConfigForm
                         ->label(__('feedmanager::feedmanager.fields.default_b2b_allowed'))
                         ->default(true)
                         ->helperText(__('feedmanager::feedmanager.helpers.default_b2b_allowed')),
+                    Toggle::make('update_only_mode')
+                        ->label(__('feedmanager::feedmanager.fields.update_only_mode'))
+                        ->default(false)
+                        ->helperText(__('feedmanager::feedmanager.helpers.update_only_mode')),
                 ]),
         ]);
     }
@@ -103,6 +107,7 @@ final class FeedConfigForm
             FeedConfig::FORMAT_GOOGLE => __('feedmanager::feedmanager.formats.google'),
             FeedConfig::FORMAT_SHOPTET => __('feedmanager::feedmanager.formats.shoptet'),
             FeedConfig::FORMAT_ZBOZI => __('feedmanager::feedmanager.formats.zbozi'),
+            FeedConfig::FORMAT_SHOPTET_STOCK_CSV => __('feedmanager::feedmanager.formats.shoptet_stock_csv'),
             FeedConfig::FORMAT_CUSTOM => __('feedmanager::feedmanager.formats.custom'),
         ];
     }

@@ -21,6 +21,7 @@ final class FeedParserFactory
             FeedConfig::FORMAT_GOOGLE => new GoogleShoppingFeedParser(),
             FeedConfig::FORMAT_SHOPTET => new ShoptetFeedParser(),
             FeedConfig::FORMAT_ZBOZI => new ZboziFeedParser(),
+            FeedConfig::FORMAT_SHOPTET_STOCK_CSV => new ShoptetStockCsvParser(),
             FeedConfig::FORMAT_CUSTOM => new CustomFeedParser(),
             default => throw new InvalidArgumentException(sprintf(
                 'Unknown feed format "%s". Must be one of: %s.',

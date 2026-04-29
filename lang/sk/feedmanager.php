@@ -214,6 +214,7 @@ return [
         'google' => 'Google Shopping',
         'shoptet' => 'Shoptet (Heuréka-štýl)',
         'zbozi' => 'Zboží.cz / Shoptet seznam export',
+        'shoptet_stock_csv' => 'Shoptet stock CSV (iba sklad)',
         'custom' => 'Vlastný (heuristika)',
         'shoptet_out' => 'Shoptet XML',
         'heureka_out' => 'Heuréka XML',
@@ -269,6 +270,7 @@ return [
         'b2b_low_stock_threshold' => 'Per-product threshold zásoby (ks)',
         'b2b_low_stock_availability' => 'Per-product hláška pri nízkej zásobe',
         'default_b2b_allowed' => 'Default B2B povolenie',
+        'update_only_mode' => 'Iba aktualizácia (nepridávať nové)',
         'notes' => 'Interná poznámka',
 
         'supplier_name' => 'Názov zdroja',
@@ -354,6 +356,7 @@ return [
         'b2b_low_stock_threshold' => 'Voliteľný per-product floor. Effective = max(partner default, tento). Ak prázdne, platí len partner default.',
         'b2b_low_stock_availability' => 'Voliteľný per-product label. Ak prázdne, použije sa partner default.',
         'default_b2b_allowed' => 'Keď zapnuté (default), nové importované produkty majú is_b2b_allowed=true. Pre re-predávaných dodávateľov bez veľkoobchodných práv vypni.',
+        'update_only_mode' => 'Pre doplnkové feedy (Shoptet stock CSV a pod.) — produkty, ktoré v katalógu neexistujú, sa nezakladajú, iba sa preskočia. Hlavný katalóg má bežať v inom FeedConfigu.',
         'slug' => 'Krátky technický identifikátor (kebab-case). Použije sa v interných referenciách a logu.',
         'supplier_is_own' => 'Zapnuté pre tvoj vlastný eshop. Vypnuté pre externých dodávateľov, od ktorých nakupuješ. Logika importu je rovnaká, slúži len na vizuálne rozlíšenie v admin UI.',
         'publish_to_shoptet' => 'Keď zapnuté, produkty z tohto zdroja vstúpia do Shoptet auto-import feedu (Tier 2 PRO). Vypni pre dodávateľov, ktorých katalóg sa nemá objaviť v klientskom eshope.',

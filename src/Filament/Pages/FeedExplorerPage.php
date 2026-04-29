@@ -79,6 +79,7 @@ final class FeedExplorerPage extends Page implements HasForms
                                 FeedConfig::FORMAT_GOOGLE => __('feedmanager::feedmanager.formats.google'),
                                 FeedConfig::FORMAT_SHOPTET => __('feedmanager::feedmanager.formats.shoptet'),
                                 FeedConfig::FORMAT_ZBOZI => __('feedmanager::feedmanager.formats.zbozi'),
+                                FeedConfig::FORMAT_SHOPTET_STOCK_CSV => __('feedmanager::feedmanager.formats.shoptet_stock_csv'),
                                 FeedConfig::FORMAT_CUSTOM => __('feedmanager::feedmanager.formats.custom'),
                             ])
                             ->default(FeedConfig::FORMAT_HEUREKA)

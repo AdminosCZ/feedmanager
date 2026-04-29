@@ -51,6 +51,7 @@ class FeedImporter
         $found = 0;
         $new = 0;
         $updated = 0;
+        $skipped = 0;
         $failed = 0;
         $errorMessage = null;
 
@@ -70,7 +71,11 @@ class FeedImporter
                     }
 
                     $result = $this->upsert($config, $transformed);
-                    $result === 'created' ? ++$new : ++$updated;
+                    match ($result) {
+                        'created' => ++$new,
+                        'updated' => ++$updated,
+                        'skipped' => ++$skipped,
+                    };
                 } catch (Throwable $rowError) {
                     ++$failed;
                     report($rowError);
@@ -99,10 +104,11 @@ class FeedImporter
                 ? FeedConfig::STATUS_SUCCESS
                 : FeedConfig::STATUS_FAILED,
             'last_message' => $errorMessage ?? sprintf(
-                'OK — found %d, new %d, updated %d, failed %d.',
+                'OK — found %d, new %d, updated %d, skipped %d, failed %d.',
                 $found,
                 $new,
                 $updated,
+                $skipped,
                 $failed,
             ),
         ])->save();
@@ -122,17 +128,20 @@ class FeedImporter
     }
 
     /**
-     * @return 'created'|'updated'
+     * @return 'created'|'updated'|'skipped'
      */
     private function upsert(FeedConfig $config, ParsedProduct $parsed): string
     {
-        /** @var Product|null $existing */
-        $existing = Product::query()
-            ->where('supplier_id', $config->supplier_id)
-            ->where('code', $parsed->code)
-            ->first();
+        $existing = $this->findExistingProduct($config->supplier_id, $parsed->code);
 
         if ($existing === null) {
+            if ($config->update_only_mode) {
+                // Stock-supplement / partial feeds intentionally don't grow
+                // the catalogue — products that don't already exist are
+                // skipped silently.
+                return 'skipped';
+            }
+
             // On create, honour the FeedConfig's `default_b2b_allowed` flag so
             // re-seller catalogues can land with B2B blocked by default. On
             // update, the existing value is preserved (admin may have flipped
@@ -157,10 +166,39 @@ class FeedImporter
 
         $existing->forceFill([
             ...$attributes,
-            'feed_config_id' => $config->id,
+            // For update-only feeds (stock supplements) keep the original
+            // feed_config_id so the catalogue's primary source is preserved.
+            'feed_config_id' => $config->update_only_mode
+                ? $existing->feed_config_id
+                : $config->id,
             'imported_at' => now(),
         ])->save();
 
         return 'updated';
+    }
+
+    private function findExistingProduct(?int $supplierId, string $code): ?Product
+    {
+        $base = Product::query()->where('supplier_id', $supplierId);
+
+        // 1. Exact match on the code as parsed.
+        $exact = (clone $base)->where('code', $code)->first();
+        if ($exact !== null) {
+            return $exact;
+        }
+
+        // 2. Stock CSV may carry the raw user-entered code (`121/XS`, `Foo Bar`)
+        //    while the existing catalogue row was imported via Shoptet's XML
+        //    feeds, which sanitize `/` and ` ` to `_`. Try the sanitized
+        //    variant before declaring no match.
+        $sanitized = str_replace(['/', ' '], '_', $code);
+        if ($sanitized !== $code) {
+            $alt = (clone $base)->where('code', $sanitized)->first();
+            if ($alt !== null) {
+                return $alt;
+            }
+        }
+
+        return null;
     }
 }

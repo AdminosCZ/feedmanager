@@ -174,6 +174,96 @@ final class FeedImporterTest extends TestCase
         $this->assertTrue($product->is_b2b_allowed, 'existing approval must survive re-import');
     }
 
+    public function test_update_only_mode_skips_unknown_products(): void
+    {
+        $config = $this->makeConfig(['update_only_mode' => true]);
+
+        // Catalogue has only SKU-1; SKU-2 from the feed should be skipped.
+        Product::query()->create([
+            'supplier_id' => $config->supplier_id,
+            'code' => 'SKU-1',
+            'name' => 'Old name',
+            'price_vat' => '50.0000',
+        ]);
+
+        $importer = $this->makeImporter($this->fakeFeedXml());
+        $log = $importer->run($config);
+
+        $this->assertSame(2, $log->products_found);
+        $this->assertSame(0, $log->products_new);
+        $this->assertSame(1, $log->products_updated);
+
+        // SKU-2 was NOT created because update_only_mode is on.
+        $this->assertNull(Product::query()->where('code', 'SKU-2')->first());
+
+        // Last message reflects the skipped count for transparency.
+        $config->refresh();
+        $this->assertStringContainsString('skipped 1', (string) $config->last_message);
+    }
+
+    public function test_update_only_mode_preserves_original_feed_config_id(): void
+    {
+        // Stock supplement updates should NOT change the product's primary
+        // feed source. The catalogue feed_config remains the source of record.
+        $catalogueConfig = $this->makeConfig();
+        $supplementConfig = FeedConfig::query()->create([
+            'supplier_id' => $catalogueConfig->supplier_id,
+            'name' => 'Stock supplement',
+            'source_url' => 'https://example.com/stock.csv',
+            'format' => FeedConfig::FORMAT_HEUREKA,
+            'update_only_mode' => true,
+        ]);
+
+        Product::query()->create([
+            'supplier_id' => $catalogueConfig->supplier_id,
+            'feed_config_id' => $catalogueConfig->id,
+            'code' => 'SKU-1',
+            'name' => 'Existing',
+            'price_vat' => '50.0000',
+        ]);
+
+        $importer = $this->makeImporter($this->fakeFeedXml());
+        $importer->run($supplementConfig);
+
+        $product = Product::query()->where('code', 'SKU-1')->first();
+        $this->assertSame($catalogueConfig->id, $product->feed_config_id);
+    }
+
+    public function test_finds_existing_product_by_sanitized_code_variant(): void
+    {
+        // Catalogue was imported via Shoptet seznam feed → code is "121_XS".
+        // Stock CSV ships the raw code "121/XS" — importer must still update.
+        $config = $this->makeConfig();
+
+        Product::query()->create([
+            'supplier_id' => $config->supplier_id,
+            'code' => '121_XS',
+            'name' => 'Variant XS',
+            'stock_quantity' => 0,
+        ]);
+
+        $payload = <<<'XML'
+<?xml version="1.0" encoding="UTF-8"?>
+<SHOP>
+  <SHOPITEM>
+    <ITEM_ID>121/XS</ITEM_ID>
+    <PRODUCTNAME>Variant XS updated</PRODUCTNAME>
+    <STOCK_AMOUNT>15</STOCK_AMOUNT>
+  </SHOPITEM>
+</SHOP>
+XML;
+
+        $importer = $this->makeImporter($payload);
+        $log = $importer->run($config);
+
+        $this->assertSame(1, $log->products_updated);
+        $this->assertSame(0, $log->products_new);
+
+        $product = Product::query()->where('code', '121_XS')->first();
+        $this->assertNotNull($product);
+        $this->assertSame(15, $product->stock_quantity);
+    }
+
     private function makeConfig(array $overrides = []): FeedConfig
     {
         $supplier = Supplier::query()->create([

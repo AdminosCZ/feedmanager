@@ -214,6 +214,7 @@ return [
         'google' => 'Google Shopping',
         'shoptet' => 'Shoptet (Heuréka-style)',
         'zbozi' => 'Zboží.cz / Shoptet seznam export',
+        'shoptet_stock_csv' => 'Shoptet stock CSV (stock only)',
         'custom' => 'Custom (heuristic)',
         'shoptet_out' => 'Shoptet XML',
         'heureka_out' => 'Heuréka XML',
@@ -269,6 +270,7 @@ return [
         'b2b_low_stock_threshold' => 'Per-product threshold floor (pcs)',
         'b2b_low_stock_availability' => 'Per-product low-stock label',
         'default_b2b_allowed' => 'Default B2B allowed',
+        'update_only_mode' => 'Update-only mode',
         'notes' => 'Internal note',
 
         'supplier_name' => 'Source name',
@@ -354,6 +356,7 @@ return [
         'b2b_low_stock_threshold' => 'Optional per-product floor. Effective threshold = max(partner default, this). Leave empty to use partner default only.',
         'b2b_low_stock_availability' => 'Optional per-product label override. Leave empty to use the partner default.',
         'default_b2b_allowed' => 'When on (default), products imported from this feed get is_b2b_allowed=true on creation. Switch off for "I am reselling, no wholesale rights" suppliers — products land B2B-blocked unless approved one by one.',
+        'update_only_mode' => 'For supplementary feeds (Shoptet stock CSV, etc.) — products that don\'t exist in the catalogue are skipped instead of created. The main catalogue should run via a separate FeedConfig.',
         'slug' => 'Short technical identifier (kebab-case). Used in internal references and logs.',
         'supplier_is_own' => 'On for the client\'s own eshop. Off for external suppliers they purchase from. Import logic is identical — the flag is purely a UX label so admins don\'t see "Supplier: Markstore" pointing at themselves.',
         'publish_to_shoptet' => 'When on, products from this source enter the Shoptet auto-import feed (Tier 2 PRO). Turn off for suppliers whose catalogue should not appear in the client\'s eshop.',
