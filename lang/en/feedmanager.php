@@ -107,6 +107,13 @@ return [
         'label' => 'My e-shop',
         'plural_label' => 'My e-shops',
         'navigation_label' => 'My e-shop',
+        'wizard' => [
+            'step_identity' => 'E-shop identity',
+            'step_primary_feed' => 'Primary catalogue',
+            'step_primary_feed_hint' => 'URL of the product feed (custom XML, Heureka, or Shoptet). You can leave it empty and add it later from the eshop detail.',
+            'step_categories_feed' => 'Shop categories',
+            'step_categories_feed_hint' => 'URL of the Shoptet categories CSV/XML export. After saving, run the sync from the Shop categories section.',
+        ],
     ],
     'suppliers' => [
         'label' => 'Supplier',
@@ -116,6 +123,12 @@ return [
             'identity' => 'Identity',
             'feeds' => 'Inbound feeds',
             'notes' => 'Notes',
+        ],
+        'wizard' => [
+            'step_identity' => 'Supplier identity',
+            'step_first_feed' => 'First feed',
+            'step_first_feed_hint' => 'Fill it in now or later. With the URL empty, only the supplier is created and feeds are added from the detail.',
+            'feed_url_hint' => 'If the feed requires HTTP Basic Auth, fill the credentials below.',
         ],
         'kind' => [
             'own' => 'Own eshop',

@@ -107,6 +107,13 @@ return [
         'label' => 'Môj e-shop',
         'plural_label' => 'Moje e-shopy',
         'navigation_label' => 'Môj e-shop',
+        'wizard' => [
+            'step_identity' => 'Identifikácia eshopu',
+            'step_primary_feed' => 'Primárny katalóg',
+            'step_primary_feed_hint' => 'URL produktového feedu. Môžeš vyplniť neskôr v detaile eshopu.',
+            'step_categories_feed' => 'Kategórie e-shopu',
+            'step_categories_feed_hint' => 'URL CSV / XML exportu kategórií zo Shoptetu. Po vytvorení spusť synchronizáciu v sekcii Kategórie e-shopu.',
+        ],
     ],
     'suppliers' => [
         'label' => 'Dodávateľ',
@@ -116,6 +123,12 @@ return [
             'identity' => 'Identifikácia',
             'feeds' => 'Vstupné feedy',
             'notes' => 'Poznámky',
+        ],
+        'wizard' => [
+            'step_identity' => 'Identifikácia dodávateľa',
+            'step_first_feed' => 'Prvý feed',
+            'step_first_feed_hint' => 'Môžeš vyplniť teraz alebo neskôr. Bez URL sa vytvorí len dodávateľ a feedy pridáš v detaile.',
+            'feed_url_hint' => 'Ak feed vyžaduje HTTP Basic Auth, vyplň meno a heslo nižšie.',
         ],
         'kind' => [
             'own' => 'Vlastný eshop',

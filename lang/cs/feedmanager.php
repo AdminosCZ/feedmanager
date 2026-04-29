@@ -107,6 +107,13 @@ return [
         'label' => 'Můj e-shop',
         'plural_label' => 'Moje e-shopy',
         'navigation_label' => 'Můj e-shop',
+        'wizard' => [
+            'step_identity' => 'Identifikace eshopu',
+            'step_primary_feed' => 'Primární katalog',
+            'step_primary_feed_hint' => 'URL produktového feedu (custom XML, Heuréka nebo Shoptet seznam). Můžeš vyplnit později — pak v detailu eshopu „Přidat feed".',
+            'step_categories_feed' => 'Kategorie e-shopu',
+            'step_categories_feed_hint' => 'URL CSV / XML exportu kategoriíí ze Shoptetu. Po vytvoření spusť synchronizaci v sekci Kategorie e-shopu.',
+        ],
     ],
     'suppliers' => [
         'label' => 'Dodavatel',
@@ -116,6 +123,12 @@ return [
             'identity' => 'Identifikace',
             'feeds' => 'Vstupní feedy',
             'notes' => 'Poznámky',
+        ],
+        'wizard' => [
+            'step_identity' => 'Identifikace dodavatele',
+            'step_first_feed' => 'První feed',
+            'step_first_feed_hint' => 'Můžeš vyplnit teď nebo později. Bez URL se vytvoří jen dodavatel a feedy přidáš v detailu.',
+            'feed_url_hint' => 'Pokud feed vyžaduje HTTP Basic Auth, vyplň jméno a heslo níže.',
         ],
         'kind' => [
             'own' => 'Vlastní eshop',
