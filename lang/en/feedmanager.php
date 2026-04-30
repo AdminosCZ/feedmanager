@@ -169,6 +169,12 @@ return [
             'scheduling' => 'Scheduling',
             'import_scope' => 'Import scope',
         ],
+        'section_descriptions' => [
+            'identity' => 'How the feed appears in admin and which source it belongs to.',
+            'source' => 'Where the feed is downloaded from, in what format, plus credentials if the feed is protected.',
+            'scheduling' => 'How often the feed runs and what defaults apply to newly imported products.',
+            'import_scope' => 'Which fields from the feed are actually pulled in. A disabled toggle leaves the field empty/unchanged in the ADMINOS database.',
+        ],
     ],
     'shoptet_categories' => [
         'label' => 'Shop category',

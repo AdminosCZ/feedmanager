@@ -16,17 +16,18 @@ final class FeedConfigForm
 {
     public static function configure(Schema $schema): Schema
     {
+        // Napojse-style aside layout: každá sekce má heading + popis vlevo,
+        // pole vpravo. Sekce stackují vertikálně, žádné 2x2 packování.
         return $schema->components([
             Section::make(__('feedmanager::feedmanager.feed_configs.sections.identity'))
-                ->columns(2)
+                ->description(__('feedmanager::feedmanager.feed_configs.section_descriptions.identity'))
+                ->aside()
                 ->components([
                     Select::make('supplier_id')
                         ->label(__('feedmanager::feedmanager.fields.source'))
-                        ->helperText(__('feedmanager::feedmanager.helpers.feed_config_source'))
                         ->relationship(
                             name: 'supplier',
                             titleAttribute: 'name',
-                            // Own eshops first, then external suppliers alphabetically.
                             modifyQueryUsing: fn ($query) => $query
                                 ->orderBy('is_own', 'desc')
                                 ->orderBy('name'),
@@ -45,14 +46,14 @@ final class FeedConfigForm
                 ]),
 
             Section::make(__('feedmanager::feedmanager.feed_configs.sections.source'))
-                ->columns(2)
+                ->description(__('feedmanager::feedmanager.feed_configs.section_descriptions.source'))
+                ->aside()
                 ->components([
                     TextInput::make('source_url')
                         ->label(__('feedmanager::feedmanager.fields.source_url'))
                         ->url()
                         ->required()
-                        ->maxLength(2048)
-                        ->columnSpanFull(),
+                        ->maxLength(2048),
                     Select::make('format')
                         ->label(__('feedmanager::feedmanager.fields.format'))
                         ->options(self::formatOptions())
@@ -67,15 +68,14 @@ final class FeedConfigForm
                         ->password()
                         ->revealable()
                         ->helperText(__('feedmanager::feedmanager.helpers.http_password'))
-                        // Don't pre-fill the encrypted password into the form on edit.
                         ->formatStateUsing(fn (): ?string => null)
-                        // An empty submission must NOT overwrite the stored value.
                         ->dehydrated(fn (?string $state): bool => filled($state))
                         ->maxLength(1024),
                 ]),
 
             Section::make(__('feedmanager::feedmanager.feed_configs.sections.scheduling'))
-                ->columns(2)
+                ->description(__('feedmanager::feedmanager.feed_configs.section_descriptions.scheduling'))
+                ->aside()
                 ->components([
                     Toggle::make('is_active')
                         ->label(__('feedmanager::feedmanager.fields.is_active'))
@@ -96,8 +96,8 @@ final class FeedConfigForm
                 ]),
 
             Section::make(__('feedmanager::feedmanager.feed_configs.sections.import_scope'))
-                ->description(__('feedmanager::feedmanager.helpers.import_scope_section'))
-                ->columns(3)
+                ->description(__('feedmanager::feedmanager.feed_configs.section_descriptions.import_scope'))
+                ->aside()
                 ->components([
                     Toggle::make('import_all_images')
                         ->label(__('feedmanager::feedmanager.fields.import_all_images'))

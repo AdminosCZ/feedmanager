@@ -169,6 +169,12 @@ return [
             'scheduling' => 'Plánovanie',
             'import_scope' => 'Rozsah importu',
         ],
+        'section_descriptions' => [
+            'identity' => 'Pod akým názvom sa feed bude zobrazovať v admine a ku ktorému zdroju patrí.',
+            'source' => 'Odkiaľ feed sťahujeme, v akom formáte, prípadne prihlasovacie údaje, ak je feed chránený.',
+            'scheduling' => 'Ako často sa feed sám spustí a aké defaulty platia pre novo importované produkty.',
+            'import_scope' => 'Ktoré polia z feedu skutočne preberáme. Vypnutý toggle = pole zostane prázdne/nezmenené v ADMINOS DB.',
+        ],
     ],
     'shoptet_categories' => [
         'label' => 'Kategórie e-shopu',
