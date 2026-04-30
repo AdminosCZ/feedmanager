@@ -7,7 +7,6 @@ namespace Adminos\Modules\Feedmanager\Filament\Resources;
 use Adminos\Modules\Feedmanager\Filament\Resources\OwnEshops\Pages\CreateOwnEshop;
 use Adminos\Modules\Feedmanager\Filament\Resources\OwnEshops\Pages\EditOwnEshop;
 use Adminos\Modules\Feedmanager\Filament\Resources\OwnEshops\Pages\ListOwnEshops;
-use Adminos\Modules\Feedmanager\Filament\Resources\OwnEshops\Pages\ViewOwnEshop;
 use Adminos\Modules\Feedmanager\Filament\Resources\Suppliers\RelationManagers\FeedConfigsRelationManager;
 use Adminos\Modules\Feedmanager\Filament\Resources\Suppliers\Tables\SuppliersTable;
 use Adminos\Modules\Feedmanager\Models\Product;
@@ -127,11 +126,13 @@ final class OwnEshopResource extends Resource
 
     public static function getPages(): array
     {
+        // Edit zabírá `/admin/own-eshops/{record}` — žádná samostatná
+        // mezi-stránka „view". Edit page má form + feed RelationManager +
+        // header akce „Spustit všechny importy" → jeden focal point.
         return [
             'index' => ListOwnEshops::route('/'),
             'create' => CreateOwnEshop::route('/create'),
-            'view' => ViewOwnEshop::route('/{record}'),
-            'edit' => EditOwnEshop::route('/{record}/edit'),
+            'edit' => EditOwnEshop::route('/{record}'),
         ];
     }
 }

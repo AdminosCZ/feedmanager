@@ -7,7 +7,6 @@ namespace Adminos\Modules\Feedmanager\Filament\Resources\Suppliers\Tables;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
-use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ViewColumn;
 use Filament\Tables\Filters\TernaryFilter;
@@ -67,10 +66,9 @@ final class SuppliersTable
                     ->label(__('feedmanager::feedmanager.fields.is_active')),
             ])
             ->recordActions([
-                ViewAction::make()
-                    ->label(__('feedmanager::feedmanager.actions.details'))
-                    ->icon('heroicon-m-eye'),
-                EditAction::make(),
+                EditAction::make()
+                    ->label(__('feedmanager::feedmanager.actions.open_detail'))
+                    ->icon('heroicon-m-arrow-right'),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([

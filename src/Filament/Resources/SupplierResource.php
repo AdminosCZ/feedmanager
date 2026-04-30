@@ -7,7 +7,6 @@ namespace Adminos\Modules\Feedmanager\Filament\Resources;
 use Adminos\Modules\Feedmanager\Filament\Resources\Suppliers\Pages\CreateSupplier;
 use Adminos\Modules\Feedmanager\Filament\Resources\Suppliers\Pages\EditSupplier;
 use Adminos\Modules\Feedmanager\Filament\Resources\Suppliers\Pages\ListSuppliers;
-use Adminos\Modules\Feedmanager\Filament\Resources\Suppliers\Pages\ViewSupplier;
 use Adminos\Modules\Feedmanager\Filament\Resources\Suppliers\RelationManagers\FeedConfigsRelationManager;
 use Adminos\Modules\Feedmanager\Filament\Resources\Suppliers\Schemas\SupplierForm;
 use Adminos\Modules\Feedmanager\Filament\Resources\Suppliers\Tables\SuppliersTable;
@@ -92,11 +91,11 @@ final class SupplierResource extends Resource
 
     public static function getPages(): array
     {
+        // Edit zabírá `/admin/suppliers/{record}` — žádná „view" mezistránka.
         return [
             'index' => ListSuppliers::route('/'),
             'create' => CreateSupplier::route('/create'),
-            'view' => ViewSupplier::route('/{record}'),
-            'edit' => EditSupplier::route('/{record}/edit'),
+            'edit' => EditSupplier::route('/{record}'),
         ];
     }
 }
