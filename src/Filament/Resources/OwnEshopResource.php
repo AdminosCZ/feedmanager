@@ -8,6 +8,7 @@ use Adminos\Modules\Feedmanager\Filament\Resources\OwnEshops\Pages\CreateOwnEsho
 use Adminos\Modules\Feedmanager\Filament\Resources\OwnEshops\Pages\EditOwnEshop;
 use Adminos\Modules\Feedmanager\Filament\Resources\OwnEshops\Pages\ListOwnEshops;
 use Adminos\Modules\Feedmanager\Filament\Resources\OwnEshops\Pages\ViewOwnEshop;
+use Adminos\Modules\Feedmanager\Filament\Resources\Suppliers\RelationManagers\FeedConfigsRelationManager;
 use Adminos\Modules\Feedmanager\Filament\Resources\Suppliers\Tables\SuppliersTable;
 use Adminos\Modules\Feedmanager\Models\Product;
 use Adminos\Modules\Feedmanager\Models\Supplier;
@@ -115,6 +116,13 @@ final class OwnEshopResource extends Resource
                         ->orWhere('update_only_mode', true),
                 ),
             ]);
+    }
+
+    public static function getRelations(): array
+    {
+        return [
+            FeedConfigsRelationManager::class,
+        ];
     }
 
     public static function getPages(): array

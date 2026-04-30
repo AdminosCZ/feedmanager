@@ -518,6 +518,7 @@ return [
         'regenerate_credentials_confirm_heading' => 'Regenerovať prístupové údaje partnera?',
         'regenerate_credentials_confirm' => 'Vygeneruje sa nový token v URL aj nové Basic Auth heslo. Aktuálne URL ani heslo už partnerovi fungovať nebudú — bude potrebné mu poslať všetky tri hodnoty znova. Akciu nemožno vrátiť späť.',
 
+        'add_feed' => 'Pridať feed',
         'run_import' => 'Spustiť import',
         'run_import_confirm_heading' => 'Spustiť import teraz?',
         'run_import_confirm' => 'Stiahne sa feed z :url a aktualizuje katalóg. Zvyčajne to trvá 10–60 sekúnd podľa veľkosti feedu.',

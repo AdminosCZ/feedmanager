@@ -518,6 +518,7 @@ return [
         'regenerate_credentials_confirm_heading' => 'Regenerate partner access credentials?',
         'regenerate_credentials_confirm' => 'A new URL token and a new Basic Auth password will be generated. The current URL and password will stop working for the partner — you\'ll need to send them all three values again. This cannot be undone.',
 
+        'add_feed' => 'Add feed',
         'run_import' => 'Run import',
         'run_import_confirm_heading' => 'Run import now?',
         'run_import_confirm' => 'The feed at :url will be downloaded and the catalog updated. Typically takes 10–60 seconds depending on feed size.',

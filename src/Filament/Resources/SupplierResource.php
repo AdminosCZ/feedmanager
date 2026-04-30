@@ -8,6 +8,7 @@ use Adminos\Modules\Feedmanager\Filament\Resources\Suppliers\Pages\CreateSupplie
 use Adminos\Modules\Feedmanager\Filament\Resources\Suppliers\Pages\EditSupplier;
 use Adminos\Modules\Feedmanager\Filament\Resources\Suppliers\Pages\ListSuppliers;
 use Adminos\Modules\Feedmanager\Filament\Resources\Suppliers\Pages\ViewSupplier;
+use Adminos\Modules\Feedmanager\Filament\Resources\Suppliers\RelationManagers\FeedConfigsRelationManager;
 use Adminos\Modules\Feedmanager\Filament\Resources\Suppliers\Schemas\SupplierForm;
 use Adminos\Modules\Feedmanager\Filament\Resources\Suppliers\Tables\SuppliersTable;
 use Adminos\Modules\Feedmanager\Models\Supplier;
@@ -64,7 +65,9 @@ final class SupplierResource extends Resource
 
     public static function getRelations(): array
     {
-        return [];
+        return [
+            FeedConfigsRelationManager::class,
+        ];
     }
 
     /**
