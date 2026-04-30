@@ -4,16 +4,15 @@ declare(strict_types=1);
 
 namespace Adminos\Modules\Feedmanager\Filament\Resources\Suppliers\RelationManagers;
 
+use Adminos\Modules\Feedmanager\Filament\Resources\FeedConfigResource;
 use Adminos\Modules\Feedmanager\Filament\Resources\FeedConfigs\Schemas\FeedConfigForm;
 use Adminos\Modules\Feedmanager\Models\FeedConfig;
 use Adminos\Modules\Feedmanager\Models\ImportLog;
 use Adminos\Modules\Feedmanager\Services\FeedImporter;
 use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
-use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
-use Filament\Actions\EditAction;
 use Filament\Notifications\Notification;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Schema;
@@ -81,9 +80,13 @@ final class FeedConfigsRelationManager extends RelationManager
                     ->placeholder('—'),
             ])
             ->headerActions([
-                CreateAction::make()
+                Action::make('add_feed')
                     ->label(__('feedmanager::feedmanager.actions.add_feed'))
-                    ->modalWidth('5xl'),
+                    ->icon('heroicon-o-plus')
+                    ->color('primary')
+                    ->url(fn (): string => FeedConfigResource::getUrl('create', [
+                        'supplier_id' => $this->getOwnerRecord()->getKey(),
+                    ])),
             ])
             ->recordActions([
                 Action::make('run_import')
@@ -128,11 +131,14 @@ final class FeedConfigsRelationManager extends RelationManager
                                 ->send();
                         }
                     }),
-                EditAction::make()
+                Action::make('edit')
                     ->iconButton()
+                    ->icon('heroicon-m-pencil-square')
                     ->tooltip(__('filament-actions::edit.single.label'))
                     ->color('gray')
-                    ->modalWidth('5xl'),
+                    ->url(fn (FeedConfig $record): string => FeedConfigResource::getUrl('edit', [
+                        'record' => $record,
+                    ])),
                 DeleteAction::make()
                     ->iconButton()
                     ->tooltip(__('filament-actions::delete.single.label')),
