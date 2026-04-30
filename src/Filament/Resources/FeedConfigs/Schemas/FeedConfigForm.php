@@ -21,7 +21,6 @@ final class FeedConfigForm
         return $schema->components([
             Section::make(__('feedmanager::feedmanager.feed_configs.sections.identity'))
                 ->description(__('feedmanager::feedmanager.feed_configs.section_descriptions.identity'))
-                ->aside()
                 ->components([
                     Select::make('supplier_id')
                         ->label(__('feedmanager::feedmanager.fields.source'))
@@ -47,7 +46,6 @@ final class FeedConfigForm
 
             Section::make(__('feedmanager::feedmanager.feed_configs.sections.source'))
                 ->description(__('feedmanager::feedmanager.feed_configs.section_descriptions.source'))
-                ->aside()
                 ->components([
                     TextInput::make('source_url')
                         ->label(__('feedmanager::feedmanager.fields.source_url'))
@@ -75,7 +73,6 @@ final class FeedConfigForm
 
             Section::make(__('feedmanager::feedmanager.feed_configs.sections.scheduling'))
                 ->description(__('feedmanager::feedmanager.feed_configs.section_descriptions.scheduling'))
-                ->aside()
                 ->components([
                     Toggle::make('is_active')
                         ->label(__('feedmanager::feedmanager.fields.is_active'))
@@ -97,7 +94,6 @@ final class FeedConfigForm
 
             Section::make(__('feedmanager::feedmanager.feed_configs.sections.import_scope'))
                 ->description(__('feedmanager::feedmanager.feed_configs.section_descriptions.import_scope'))
-                ->aside()
                 ->components([
                     Toggle::make('import_all_images')
                         ->label(__('feedmanager::feedmanager.fields.import_all_images'))
