@@ -405,6 +405,7 @@ return [
         'source_url' => 'URL zdroje',
         'format' => 'Formát',
         'auto_update' => 'Automatický update (cron)',
+        'auto_update_short' => 'Aut. update',
         'http_username' => 'HTTP username (basic auth)',
         'http_password' => 'HTTP heslo (basic auth)',
         'last_run_at' => 'Poslední běh',

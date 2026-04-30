@@ -61,7 +61,7 @@ final class FeedConfigsRelationManager extends RelationManager
                     ->label(__('feedmanager::feedmanager.fields.is_active'))
                     ->boolean(),
                 IconColumn::make('auto_update')
-                    ->label(__('feedmanager::feedmanager.fields.auto_update'))
+                    ->label(__('feedmanager::feedmanager.fields.auto_update_short'))
                     ->boolean()
                     ->toggleable(),
                 TextColumn::make('last_status')
@@ -127,8 +127,10 @@ final class FeedConfigsRelationManager extends RelationManager
                                 ->send();
                         }
                     }),
-                EditAction::make(),
-                DeleteAction::make(),
+                EditAction::make()
+                    ->color('gray'),
+                DeleteAction::make()
+                    ->iconButton(),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([

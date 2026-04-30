@@ -405,6 +405,7 @@ return [
         'source_url' => 'Source URL',
         'format' => 'Format',
         'auto_update' => 'Auto-update (cron)',
+        'auto_update_short' => 'Auto-update',
         'http_username' => 'HTTP username (basic auth)',
         'http_password' => 'HTTP password (basic auth)',
         'last_run_at' => 'Last run',
