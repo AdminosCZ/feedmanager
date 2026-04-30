@@ -82,7 +82,8 @@ final class FeedConfigsRelationManager extends RelationManager
             ])
             ->headerActions([
                 CreateAction::make()
-                    ->label(__('feedmanager::feedmanager.actions.add_feed')),
+                    ->label(__('feedmanager::feedmanager.actions.add_feed'))
+                    ->modalWidth('5xl'),
             ])
             ->recordActions([
                 Action::make('run_import')
@@ -128,9 +129,13 @@ final class FeedConfigsRelationManager extends RelationManager
                         }
                     }),
                 EditAction::make()
-                    ->color('gray'),
+                    ->iconButton()
+                    ->tooltip(__('filament-actions::edit.single.label'))
+                    ->color('gray')
+                    ->modalWidth('5xl'),
                 DeleteAction::make()
-                    ->iconButton(),
+                    ->iconButton()
+                    ->tooltip(__('filament-actions::delete.single.label')),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
