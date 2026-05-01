@@ -39,6 +39,9 @@ final class FeedConfigForm
                         ->required()
                         ->preload()
                         ->searchable()
+                        // Reactive — Basic Auth visibility v sekci Zdroj
+                        // feedu se přepočítá, když admin přepne dodavatele.
+                        ->live()
                         ->createOptionForm([
                             TextInput::make('name')->required(),
                             TextInput::make('slug')->required()->unique(Supplier::class, 'slug'),
@@ -65,9 +68,15 @@ final class FeedConfigForm
                         ->required()
                         ->default(FeedConfig::FORMAT_HEUREKA)
                         ->native(false),
+                    // HTTP Basic Auth má smysl jen pro externí dodavatele
+                    // (Heureka feedy s heslem, partner-area exporty s API
+                    // klíčem v auth headeru atd.). Vlastní eshop chodí přes
+                    // tokenizovanou URL (?partnerId=…&hash=…), Basic Auth tam
+                    // jen mate. Skryj, když vybraný supplier je is_own=true.
                     TextInput::make('http_username')
                         ->label(__('feedmanager::feedmanager.fields.http_username'))
-                        ->maxLength(255),
+                        ->maxLength(255)
+                        ->visible(fn (callable $get): bool => ! self::supplierIsOwn($get('supplier_id'))),
                     TextInput::make('http_password')
                         ->label(__('feedmanager::feedmanager.fields.http_password'))
                         ->password()
@@ -75,7 +84,8 @@ final class FeedConfigForm
                         ->helperText(__('feedmanager::feedmanager.helpers.http_password'))
                         ->formatStateUsing(fn (): ?string => null)
                         ->dehydrated(fn (?string $state): bool => filled($state))
-                        ->maxLength(1024),
+                        ->maxLength(1024)
+                        ->visible(fn (callable $get): bool => ! self::supplierIsOwn($get('supplier_id'))),
                 ]),
 
             Section::make(__('feedmanager::feedmanager.feed_configs.sections.scheduling'))
@@ -124,6 +134,18 @@ final class FeedConfigForm
                         ->helperText(__('feedmanager::feedmanager.helpers.import_parameters_only')),
                 ]),
         ]);
+    }
+
+    private static function supplierIsOwn(int|string|null $supplierId): bool
+    {
+        if (! $supplierId) {
+            return false;
+        }
+
+        return Supplier::query()
+            ->whereKey($supplierId)
+            ->where('is_own', true)
+            ->exists();
     }
 
     /**

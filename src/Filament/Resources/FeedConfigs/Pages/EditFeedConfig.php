@@ -19,9 +19,25 @@ final class EditFeedConfig extends EditRecord
 {
     protected static string $resource = FeedConfigResource::class;
 
+    /**
+     * Save / Cancel patří do hlavičky vedle ostatních header actions —
+     * jeden focal point místo bottom-form-bar mimo zorné pole.
+     *
+     * @return array<int, mixed>
+     */
+    protected function getFormActions(): array
+    {
+        return [];
+    }
+
     protected function getHeaderActions(): array
     {
         return [
+            $this->getSaveFormAction()
+                ->color('primary')
+                ->icon('heroicon-m-check'),
+            $this->getCancelFormAction()
+                ->color('gray'),
             Action::make('test_connection')
                 ->label(__('feedmanager::feedmanager.actions.test_connection'))
                 ->icon('heroicon-o-signal')

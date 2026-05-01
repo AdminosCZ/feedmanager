@@ -28,4 +28,25 @@ final class CreateFeedConfig extends CreateRecord
             ]);
         }
     }
+
+    /**
+     * Save / Cancel se přesouvají do hlavičky.
+     *
+     * @return array<int, mixed>
+     */
+    protected function getFormActions(): array
+    {
+        return [];
+    }
+
+    protected function getHeaderActions(): array
+    {
+        return [
+            $this->getCreateFormAction()
+                ->color('primary')
+                ->icon('heroicon-m-check'),
+            $this->getCancelFormAction()
+                ->color('gray'),
+        ];
+    }
 }
