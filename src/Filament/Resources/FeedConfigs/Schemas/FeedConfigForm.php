@@ -96,19 +96,23 @@ final class FeedConfigForm
                     Toggle::make('is_active')
                         ->label(__('feedmanager::feedmanager.fields.is_active'))
                         ->default(true)
-                        ->helperText(__('feedmanager::feedmanager.helpers.feed_config_is_active')),
+                        ->helperText(__('feedmanager::feedmanager.helpers.feed_config_is_active'))
+                        ->inlineLabel(),
                     Toggle::make('auto_update')
                         ->label(__('feedmanager::feedmanager.fields.auto_update'))
                         ->default(false)
-                        ->helperText(__('feedmanager::feedmanager.helpers.auto_update')),
+                        ->helperText(__('feedmanager::feedmanager.helpers.auto_update'))
+                        ->inlineLabel(),
                     Toggle::make('default_b2b_allowed')
                         ->label(__('feedmanager::feedmanager.fields.default_b2b_allowed'))
                         ->default(true)
-                        ->helperText(__('feedmanager::feedmanager.helpers.default_b2b_allowed')),
+                        ->helperText(__('feedmanager::feedmanager.helpers.default_b2b_allowed'))
+                        ->inlineLabel(),
                     Toggle::make('update_only_mode')
                         ->label(__('feedmanager::feedmanager.fields.update_only_mode'))
                         ->default(false)
-                        ->helperText(__('feedmanager::feedmanager.helpers.update_only_mode')),
+                        ->helperText(__('feedmanager::feedmanager.helpers.update_only_mode'))
+                        ->inlineLabel(),
                 ]),
 
             Section::make(__('feedmanager::feedmanager.feed_configs.sections.import_scope'))
@@ -119,19 +123,23 @@ final class FeedConfigForm
                     Toggle::make('import_all_images')
                         ->label(__('feedmanager::feedmanager.fields.import_all_images'))
                         ->default(true)
-                        ->helperText(__('feedmanager::feedmanager.helpers.import_all_images')),
+                        ->helperText(__('feedmanager::feedmanager.helpers.import_all_images'))
+                        ->inlineLabel(),
                     Toggle::make('import_short_description')
                         ->label(__('feedmanager::feedmanager.fields.import_short_description'))
                         ->default(true)
-                        ->helperText(__('feedmanager::feedmanager.helpers.import_short_description')),
+                        ->helperText(__('feedmanager::feedmanager.helpers.import_short_description'))
+                        ->inlineLabel(),
                     Toggle::make('import_long_description')
                         ->label(__('feedmanager::feedmanager.fields.import_long_description'))
                         ->default(true)
-                        ->helperText(__('feedmanager::feedmanager.helpers.import_long_description')),
+                        ->helperText(__('feedmanager::feedmanager.helpers.import_long_description'))
+                        ->inlineLabel(),
                     Toggle::make('import_parameters_only')
                         ->label(__('feedmanager::feedmanager.fields.import_parameters_only'))
                         ->default(false)
-                        ->helperText(__('feedmanager::feedmanager.helpers.import_parameters_only')),
+                        ->helperText(__('feedmanager::feedmanager.helpers.import_parameters_only'))
+                        ->inlineLabel(),
                 ]),
         ]);
     }
