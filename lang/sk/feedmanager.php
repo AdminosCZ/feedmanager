@@ -526,6 +526,8 @@ return [
         'regenerate_credentials_confirm' => 'Vygeneruje sa nový token v URL aj nové Basic Auth heslo. Aktuálne URL ani heslo už partnerovi fungovať nebudú — bude potrebné mu poslať všetky tri hodnoty znova. Akciu nemožno vrátiť späť.',
 
         'add_feed' => 'Pridať feed',
+        'save' => 'Uložiť',
+        'back' => 'Späť',
         'open_detail' => 'Otvoriť',
         'run_all_imports' => 'Spustiť všetky importy',
         'run_all_imports_heading' => 'Spustiť import všetkých aktívnych feedov?',

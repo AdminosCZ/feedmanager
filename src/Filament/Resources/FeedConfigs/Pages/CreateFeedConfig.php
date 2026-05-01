@@ -43,9 +43,12 @@ final class CreateFeedConfig extends CreateRecord
     {
         return [
             $this->getCreateFormAction()
-                ->color('primary')
+                ->label(__('feedmanager::feedmanager.actions.save'))
+                ->color('success')
                 ->icon('heroicon-m-check'),
             $this->getCancelFormAction()
+                ->label(__('feedmanager::feedmanager.actions.back'))
+                ->icon('heroicon-m-arrow-uturn-left')
                 ->color('gray'),
         ];
     }

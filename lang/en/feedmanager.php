@@ -526,6 +526,8 @@ return [
         'regenerate_credentials_confirm' => 'A new URL token and a new Basic Auth password will be generated. The current URL and password will stop working for the partner — you\'ll need to send them all three values again. This cannot be undone.',
 
         'add_feed' => 'Add feed',
+        'save' => 'Save',
+        'back' => 'Back',
         'open_detail' => 'Open',
         'run_all_imports' => 'Run all imports',
         'run_all_imports_heading' => 'Run import for all active feeds?',

@@ -34,10 +34,9 @@ final class EditFeedConfig extends EditRecord
     {
         return [
             $this->getSaveFormAction()
-                ->color('primary')
+                ->label(__('feedmanager::feedmanager.actions.save'))
+                ->color('success')
                 ->icon('heroicon-m-check'),
-            $this->getCancelFormAction()
-                ->color('gray'),
             Action::make('test_connection')
                 ->label(__('feedmanager::feedmanager.actions.test_connection'))
                 ->icon('heroicon-o-signal')
@@ -106,6 +105,10 @@ final class EditFeedConfig extends EditRecord
 
                     $this->refreshFormData(['last_status', 'last_run_at']);
                 }),
+            $this->getCancelFormAction()
+                ->label(__('feedmanager::feedmanager.actions.back'))
+                ->icon('heroicon-m-arrow-uturn-left')
+                ->color('gray'),
             DeleteAction::make(),
         ];
     }
