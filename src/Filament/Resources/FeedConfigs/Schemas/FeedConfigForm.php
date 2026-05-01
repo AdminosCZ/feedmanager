@@ -18,7 +18,10 @@ final class FeedConfigForm
     {
         // Napojse-style aside layout: každá sekce má heading + popis vlevo,
         // pole vpravo. Sekce stackují vertikálně, žádné 2x2 packování.
-        return $schema->components([
+        // `->columns(1)` na vnějším Schema přebíjí Filament default
+        // `cols-lg: repeat(2, ...)`, který by jinak rozbil sekce do dvou
+        // sloupců na širších obrazovkách.
+        return $schema->columns(1)->components([
             Section::make(__('feedmanager::feedmanager.feed_configs.sections.identity'))
                 ->description(__('feedmanager::feedmanager.feed_configs.section_descriptions.identity'))
                 ->aside()
