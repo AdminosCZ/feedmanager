@@ -10,6 +10,7 @@ use Adminos\Modules\Feedmanager\Services\FeedDownloader;
 use Adminos\Modules\Feedmanager\Services\FeedExplorerService;
 use Adminos\Modules\Feedmanager\Services\FeedImporter;
 use Adminos\Modules\Feedmanager\Services\Parsing\FeedParserFactory;
+use Adminos\Modules\Feedmanager\Services\B2bInclusion\B2bInclusionResolver;
 use Adminos\Modules\Feedmanager\Services\Parsing\ShoptetCategoriesParser;
 use Adminos\Modules\Feedmanager\Services\RuleEngine\RuleEngine;
 use Adminos\Modules\Feedmanager\Services\ShoptetCategorySyncService;
@@ -33,6 +34,10 @@ final class FeedmanagerServiceProvider extends ServiceProvider
         );
         $this->app->singleton(ShoptetCategoriesParser::class);
         $this->app->singleton(ShoptetCategorySyncService::class);
+        // B2bInclusionResolver má cache excluded category set per instance —
+        // singleton sdílí cache napříč voláními v jednom requestu, ale přežije
+        // i mezi Livewire requesty (cache se musí flushnout po změně flagů).
+        $this->app->singleton(B2bInclusionResolver::class);
         $this->app->singleton(FeedImporter::class);
     }
 

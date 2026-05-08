@@ -33,6 +33,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property string|null $complete_path
  * @property bool $is_b2b_allowed
  * @property bool $is_b2b_paused
+ * @property string|null $b2b_inclusion_override
  * @property bool $is_excluded
  * @property string|null $override_name
  * @property string|null $override_description
@@ -52,6 +53,16 @@ final class Product extends Model
 
     /** @var array<int, string> */
     public const STATUSES = [self::STATUS_PENDING, self::STATUS_APPROVED, self::STATUS_REJECTED];
+
+    public const B2B_OVERRIDE_FORCE_ALLOWED = 'force_allowed';
+
+    public const B2B_OVERRIDE_FORCE_EXCLUDED = 'force_excluded';
+
+    /** @var array<int, string> */
+    public const B2B_OVERRIDES = [
+        self::B2B_OVERRIDE_FORCE_ALLOWED,
+        self::B2B_OVERRIDE_FORCE_EXCLUDED,
+    ];
 
     protected $table = 'feedmanager_products';
 

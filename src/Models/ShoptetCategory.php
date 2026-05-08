@@ -20,6 +20,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property int $depth
  * @property \Illuminate\Support\Carbon|null $synced_at
  * @property bool $is_orphaned
+ * @property bool $exclude_from_b2b
  *
  * @api
  */
@@ -31,6 +32,7 @@ final class ShoptetCategory extends Model
 
     protected $attributes = [
         'is_orphaned' => false,
+        'exclude_from_b2b' => false,
     ];
 
     protected $casts = [
@@ -41,6 +43,7 @@ final class ShoptetCategory extends Model
         'depth' => 'integer',
         'synced_at' => 'datetime',
         'is_orphaned' => 'boolean',
+        'exclude_from_b2b' => 'boolean',
     ];
 
     /**
