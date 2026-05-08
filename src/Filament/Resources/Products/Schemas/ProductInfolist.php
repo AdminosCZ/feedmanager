@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Adminos\Modules\Feedmanager\Filament\Resources\Products\Schemas;
 
 use Adminos\Modules\Feedmanager\Models\Product;
+use Adminos\Modules\Feedmanager\Services\B2bInclusion\B2bInclusionReason;
+use Adminos\Modules\Feedmanager\Services\B2bInclusion\B2bInclusionResolver;
 use Filament\Infolists\Components\KeyValueEntry;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Infolists\Components\ViewEntry;
@@ -163,6 +165,26 @@ final class ProductInfolist
                     ]),
             ]),
 
+            // ── B2B STATUS (audit trail s důvodem) ──────────────────────
+            Section::make(__('feedmanager::feedmanager.products.sections.b2b_status'))
+                ->icon('heroicon-o-shield-check')
+                ->components([
+                    TextEntry::make('b2b_status')
+                        ->label('')
+                        ->state(fn (Product $record): string => self::resolveB2bStatusKey($record))
+                        ->badge()
+                        ->color(fn (string $state): string => str_starts_with($state, 'included_')
+                            ? 'success'
+                            : 'danger')
+                        ->formatStateUsing(fn (string $state): string => __(
+                            'feedmanager::feedmanager.products.b2b_status.'.$state,
+                        )),
+                    TextEntry::make('b2b_status_detail')
+                        ->label('')
+                        ->state(fn (Product $record): string => self::resolveB2bStatusDetail($record))
+                        ->color('gray'),
+                ]),
+
             // ── IMPORT META (collapsed, full width) ─────────────────────
             Section::make(__('feedmanager::feedmanager.products.sections.import_info'))
                 ->icon('heroicon-o-clock')
@@ -210,6 +232,35 @@ final class ProductInfolist
         }
 
         return $urls;
+    }
+
+    /**
+     * Vyhodnotí B2B inclusion stav pro produkt přes resolver. Vrací string
+     * key shodný s `B2bInclusionReason->value` — slouží jako lang klíč
+     * (`products.b2b_status.<value>`) i jako podklad pro color closure.
+     */
+    private static function resolveB2bStatusKey(Product $record): string
+    {
+        return app(B2bInclusionResolver::class)->resolve($record)->reason->value;
+    }
+
+    /**
+     * Human-readable detail důvodu — např. „Vyloučeno přes kategorii
+     * Náhradní díly". Slouží jako audit trail pro admina.
+     */
+    private static function resolveB2bStatusDetail(Product $record): string
+    {
+        $result = app(B2bInclusionResolver::class)->resolve($record);
+
+        if ($result->reason === B2bInclusionReason::EXCLUDED_CATEGORY
+            && $result->excludingCategory !== null) {
+            return __('feedmanager::feedmanager.products.b2b_status_detail.excluded_category', [
+                'path' => $result->excludingCategory->full_path
+                    ?? $result->excludingCategory->title,
+            ]);
+        }
+
+        return __('feedmanager::feedmanager.products.b2b_status_detail.'.$result->reason->value);
     }
 
     private static function formatPrice(?string $value): string

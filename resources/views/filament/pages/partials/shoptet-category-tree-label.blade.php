@@ -1,9 +1,15 @@
 @php
     /** @var \Adminos\Modules\Feedmanager\Models\ShoptetCategory $node */
     /** @var int $mappingCount */
+    /** @var array<int, true> $b2bExcluded */
 
     $linkText = trim((string) $node->link_text);
     $showLinkText = $linkText !== '' && $linkText !== $node->title;
+
+    $b2bExcluded ??= [];
+    $isExplicitlyExcluded = $node->exclude_from_b2b === true;
+    $isCascadedExcluded = ! $isExplicitlyExcluded && isset($b2bExcluded[$node->id]);
+    $hasAnyExclusion = $isExplicitlyExcluded || $isCascadedExcluded;
 @endphp
 
 <span
@@ -50,3 +56,24 @@
         {{ $mappingCount }}
     </span>
 @endif
+
+{{-- B2B exclusion shield. Klikatelný (Livewire toggle) jen na vlastní flag;
+     cascaded stav se mění z parent kategorie. --}}
+<button
+    type="button"
+    wire:click.stop="toggleB2bExclusion({{ $node->id }})"
+    onclick="event.stopPropagation()"
+    class="fi-fl-tree-b2b-shield {{ $isExplicitlyExcluded ? 'fi-fl-tree-b2b-shield--explicit' : ($isCascadedExcluded ? 'fi-fl-tree-b2b-shield--cascaded' : 'fi-fl-tree-b2b-shield--idle') }}"
+    title="{{ $isExplicitlyExcluded
+        ? __('feedmanager::feedmanager.shoptet_categories.tree.b2b_excluded_explicit')
+        : ($isCascadedExcluded
+            ? __('feedmanager::feedmanager.shoptet_categories.tree.b2b_excluded_cascaded')
+            : __('feedmanager::feedmanager.shoptet_categories.tree.b2b_toggle_exclude')) }}"
+    aria-label="{{ __('feedmanager::feedmanager.shoptet_categories.tree.b2b_toggle_exclude') }}"
+>
+    {{-- Shield s X uvnitř (heroicon-s no-symbol style). Stejný symbol pro
+         všechny stavy, vzhled mění CSS třídy podle exclusion stavu. --}}
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+        <path fill-rule="evenodd" d="M10 1c-1.828.487-3.772.808-5.625.93C3.673 1.989 3 2.665 3 3.502v3.249c0 5.18 3.045 9.337 7 10.749 3.955-1.412 7-5.57 7-10.749V3.502c0-.836-.673-1.513-1.375-1.572A22.62 22.62 0 0 1 10 1Zm-3.03 6.53a.75.75 0 0 1 1.06 0L10 9.439l1.97-1.97a.75.75 0 1 1 1.06 1.061L11.061 10.5l1.97 1.97a.75.75 0 1 1-1.061 1.06L10 11.561l-1.97 1.97a.75.75 0 1 1-1.06-1.061l1.97-1.97-1.97-1.969a.75.75 0 0 1 0-1.061Z" clip-rule="evenodd"/>
+    </svg>
+</button>

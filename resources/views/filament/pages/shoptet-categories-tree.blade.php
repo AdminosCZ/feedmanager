@@ -4,6 +4,7 @@
     $counts = $this->getMappingCounts();
     $orphanCount = $this->getOrphanCount();
     $searchIndex = $this->getSearchIndex();
+    $b2bExcluded = $this->getB2bExcludedIds();
 @endphp
 
 <x-filament-panels::page>
@@ -130,6 +131,51 @@
             .fi-fl-tree-visibility--off {
                 color: rgb(235 65 67); /* danger red — matches Apple-vibe danger */
                 opacity: 0.85;
+            }
+
+            .fi-fl-tree-b2b-shield {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                width: 1.5rem;
+                height: 1.5rem;
+                flex: none;
+                background: transparent;
+                border: none;
+                border-radius: 0.375rem;
+                cursor: pointer;
+                transition: background-color 150ms ease, color 150ms ease, opacity 150ms ease;
+                padding: 0;
+            }
+            .fi-fl-tree-b2b-shield svg {
+                width: 0.9375rem;
+                height: 0.9375rem;
+            }
+            .fi-fl-tree-b2b-shield--idle {
+                color: rgb(203 213 225);
+                opacity: 0;
+            }
+            .fi-fl-tree-row:hover .fi-fl-tree-b2b-shield--idle {
+                opacity: 1;
+            }
+            .fi-fl-tree-b2b-shield--idle:hover {
+                background: rgba(235, 65, 67, 0.12);
+                color: rgb(235 65 67);
+            }
+            .fi-fl-tree-b2b-shield--explicit {
+                color: rgb(235 65 67);
+                opacity: 1;
+            }
+            .fi-fl-tree-b2b-shield--explicit:hover {
+                background: rgba(235, 65, 67, 0.16);
+            }
+            .fi-fl-tree-b2b-shield--cascaded {
+                color: rgb(235 65 67);
+                opacity: 0.45;
+                cursor: default;
+            }
+            .dark .fi-fl-tree-b2b-shield--idle {
+                color: rgb(100 116 139);
             }
 
             .fi-fl-tree-badge {
@@ -261,6 +307,7 @@
                         @include('feedmanager::filament.pages.partials.shoptet-category-tree-node', [
                             'node' => $root,
                             'counts' => $counts,
+                            'b2bExcluded' => $b2bExcluded,
                             'depth' => 0,
                         ])
                     @endforeach

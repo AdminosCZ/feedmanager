@@ -239,6 +239,49 @@ final class ProductsTable
                                 ->success()
                                 ->send();
                         }),
+                    BulkAction::make('force_allow_b2b')
+                        ->label(__('feedmanager::feedmanager.actions.bulk_force_allow_b2b'))
+                        ->icon('heroicon-o-shield-check')
+                        ->color('success')
+                        ->requiresConfirmation()
+                        ->modalHeading(__('feedmanager::feedmanager.actions.bulk_force_allow_b2b_heading'))
+                        ->modalDescription(__('feedmanager::feedmanager.actions.bulk_force_allow_b2b_description'))
+                        ->action(function (Collection $records): void {
+                            $records->each(fn (Product $r) => $r->update([
+                                'b2b_inclusion_override' => Product::B2B_OVERRIDE_FORCE_ALLOWED,
+                            ]));
+                            Notification::make()
+                                ->title(__('feedmanager::feedmanager.notifications.bulk_b2b_force_allowed', ['count' => $records->count()]))
+                                ->success()
+                                ->send();
+                        }),
+                    BulkAction::make('force_exclude_b2b')
+                        ->label(__('feedmanager::feedmanager.actions.bulk_force_exclude_b2b'))
+                        ->icon('heroicon-o-shield-exclamation')
+                        ->color('danger')
+                        ->requiresConfirmation()
+                        ->action(function (Collection $records): void {
+                            $records->each(fn (Product $r) => $r->update([
+                                'b2b_inclusion_override' => Product::B2B_OVERRIDE_FORCE_EXCLUDED,
+                            ]));
+                            Notification::make()
+                                ->title(__('feedmanager::feedmanager.notifications.bulk_b2b_force_excluded', ['count' => $records->count()]))
+                                ->warning()
+                                ->send();
+                        }),
+                    BulkAction::make('reset_b2b_override')
+                        ->label(__('feedmanager::feedmanager.actions.bulk_reset_b2b_override'))
+                        ->icon('heroicon-o-arrow-uturn-left')
+                        ->color('gray')
+                        ->action(function (Collection $records): void {
+                            $records->each(fn (Product $r) => $r->update([
+                                'b2b_inclusion_override' => null,
+                            ]));
+                            Notification::make()
+                                ->title(__('feedmanager::feedmanager.notifications.bulk_b2b_override_reset', ['count' => $records->count()]))
+                                ->success()
+                                ->send();
+                        }),
                     BulkAction::make('approve')
                         ->label(__('feedmanager::feedmanager.actions.bulk_approve'))
                         ->icon('heroicon-o-check-badge')

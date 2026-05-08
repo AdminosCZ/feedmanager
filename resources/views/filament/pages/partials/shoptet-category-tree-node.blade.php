@@ -1,10 +1,12 @@
 @php
     /** @var \Adminos\Modules\Feedmanager\Models\ShoptetCategory $node */
     /** @var array<int, int> $counts */
+    /** @var array<int, true> $b2bExcluded */
     /** @var int $depth */
     $children = $node->children;
     $hasChildren = $children->isNotEmpty();
     $mappingCount = $counts[$node->id] ?? 0;
+    $b2bExcluded ??= [];
 @endphp
 
 <li
@@ -23,6 +25,7 @@
                 @include('feedmanager::filament.pages.partials.shoptet-category-tree-label', [
                     'node' => $node,
                     'mappingCount' => $mappingCount,
+                    'b2bExcluded' => $b2bExcluded,
                 ])
             </summary>
 
@@ -31,6 +34,7 @@
                     @include('feedmanager::filament.pages.partials.shoptet-category-tree-node', [
                         'node' => $child,
                         'counts' => $counts,
+                        'b2bExcluded' => $b2bExcluded,
                         'depth' => $depth + 1,
                     ])
                 @endforeach

@@ -9,6 +9,7 @@ use Adminos\Modules\Feedmanager\Models\CategoryMapping;
 use Adminos\Modules\Feedmanager\Models\FeedConfig;
 use Adminos\Modules\Feedmanager\Models\ImportLog;
 use Adminos\Modules\Feedmanager\Models\ShoptetCategory;
+use Adminos\Modules\Feedmanager\Services\B2bInclusion\B2bInclusionResolver;
 use Adminos\Modules\Feedmanager\Services\ShoptetCategorySyncService;
 use Filament\Actions\Action;
 use Filament\Forms\Components\Select;
@@ -91,6 +92,49 @@ final class ListShoptetCategories extends Page
     public function getOrphanCount(): int
     {
         return ShoptetCategory::query()->where('is_orphaned', true)->count();
+    }
+
+    /**
+     * Plochá množina shoptet_category.id v B2B exclusion stromu (vlastní
+     * flag + cascaded přes parent). Blade používá pro per-node vizuální
+     * stav „explicit vs cascaded".
+     *
+     * @return array<int, true>  set jako asociativní pole pro O(1) lookup
+     */
+    public function getB2bExcludedIds(): array
+    {
+        return app(B2bInclusionResolver::class)
+            ->excludedCategoryIds()
+            ->mapWithKeys(fn (int $id): array => [$id => true])
+            ->all();
+    }
+
+    /**
+     * Toggle akce volaná z tree-node přes wire:click. Sklopí
+     * `exclude_from_b2b` na dané kategorii a flushne resolver cache,
+     * takže další render zohlední změnu (i pro descendants).
+     */
+    public function toggleB2bExclusion(int $categoryId): void
+    {
+        $category = ShoptetCategory::query()->find($categoryId);
+        if ($category === null) {
+            return;
+        }
+
+        $category->update(['exclude_from_b2b' => ! $category->exclude_from_b2b]);
+
+        // Singleton resolver má cachované IDs — bez flushe by descendants
+        // nereagovali na změnu rootu.
+        app(B2bInclusionResolver::class)->flushCache();
+
+        Notification::make()
+            ->title(__($category->exclude_from_b2b
+                ? 'feedmanager::feedmanager.shoptet_categories.tree.b2b_excluded_now'
+                : 'feedmanager::feedmanager.shoptet_categories.tree.b2b_included_now',
+                ['title' => $category->title],
+            ))
+            ->success()
+            ->send();
     }
 
     /**
